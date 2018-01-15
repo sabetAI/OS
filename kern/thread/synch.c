@@ -190,6 +190,7 @@ lock_acquire(struct lock *lock)
 
 void
 lock_release(struct lock *lock)
+{
 
         // Added
         spinlock_release(&lock->lk);
