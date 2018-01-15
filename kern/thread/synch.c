@@ -164,7 +164,7 @@ lock_create(const char *name)
         }
 
         // added
-        spinlock_init(lock->lk);
+        spinlock_init(&lock->lk);
         
         return lock;
 }
@@ -175,7 +175,7 @@ lock_destroy(struct lock *lock)
         KASSERT(lock != NULL);
 
         // added stuff
-        spinlock_cleanup(lock->lk);
+        spinlock_cleanup(&lock->lk);
 
         kfree(lock->lk_name);
         kfree(lock);
@@ -185,21 +185,21 @@ void
 lock_acquire(struct lock *lock)
 {
         // Writen
-        spinlock_acquire(lock->lk);
+        spinlock_acquire(&lock->lk);
 }
 
 void
 lock_release(struct lock *lock)
 
         // Added
-        spinlock_release(lock->lk);
+        spinlock_release(&lock->lk);
 }
 
 bool
 lock_do_i_hold(struct lock *lock)
 {
         // finito
-        return spinlock_do_i_hold(lock->lk); 
+        return spinlock_do_i_hold(&lock->lk); 
 }
 
 ////////////////////////////////////////////////////////////
