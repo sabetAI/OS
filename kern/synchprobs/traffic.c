@@ -77,7 +77,7 @@ typedef struct Vehicles
 
 /*  vehicles in the intersection */
 /*  note: this is an array of volatile pointers */
-static Vehicle * volatile vehicles[MAX_THREADS];
+static Vehicle *vehicles[MAX_THREADS];
 /* semaphore to protect vehicles array */
 static struct semaphore *mutex;
 
