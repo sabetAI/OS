@@ -9,14 +9,45 @@
 #include <thread.h>
 #include <addrspace.h>
 #include <copyinout.h>
-
-
+#include <queue.h>
 
 #if OPT_A2
-pid_t fork(void){
+pid_t sys_fork(struct trapframe *parent_tf, pid_t *child_pid){
+    /* Create new process struct */
+    struct proc *child_proc = proc_create_runprogram(curproc->p_name);
+    if (child_proc == NULL){
+        DEBUG(DB_SYSCALL, "proc_create_runprogram() failed in sys_fork()\n");
+        return ENPROC;
+    }
+    /* copy old address spaces to new one */
+    struct addrspace *newas;
+    if (as_copy(curproc_getas(), newas) != 0){
+        DEBUG(DB_SYSCALL, "as_copy() out of memory in sys_fork()!\n");
+        proc_destroy(child_proc);
+        return ENOMEM;
+    }
 
+    child_proc->p_addrspace = newas; // don't need to use lock because not shared
+    child_proc->pid = genPID();    
+   
+    struct trapframe *child_tf = kmalloc(sizeof(struct trapframe));
+    if (child_tf == NULL){
+        DEBUG(DB_SYSCALL, "couldn't create trapframe in sys_fork().\n");
+        proc_destroy(child_proc);
+        return ENOMEM;
+    }
 
+    memcpy(child_tf, parent_tf, sizeof(struct trapframe));
+    int exit_status = thread_fork(curproc->p_name, child_proc, &enter_forked_process, child_tf, 0);
+    if(exit_status){
+        DEBUG(DB_SYSCALL, "thread_fork() fail in sys_fork()")
+        proc_destroy(child_proc);
+        kfree(child_tf);
+        return exit_status; 
+    }
 
+    *child_pid = child_proc->pid;
+    return 0;
 }
 
 #endif /* OPT_A2 */

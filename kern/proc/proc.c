@@ -70,6 +70,28 @@ struct semaphore *no_proc_sem;
 #endif  // UW
 
 
+#if OPT_A2
+struct queue *reuse_pids;
+pid_t pids_n = 1;
+struct lock *pid_lock; 
+
+pid_t genPID(void){
+   lock_acquire(pid_lock);
+   if(!q_empty(reuse_pids)){
+        pid_t pid = q_remhead(reuse_pids);
+        lock_release(pid_lock);
+        return pid;
+   } else {
+        pid_t pid = ++pids_n;
+        lock_release(pid_lock);
+        return pid;
+   }
+}
+
+
+
+#endif /* OPT_A2  */
+
 
 /*
  * Create a proc structure.
@@ -208,6 +230,10 @@ proc_bootstrap(void)
     panic("could not create no_proc_sem semaphore\n");
   }
 #endif // UW 
+#if OPT_A2
+    reuse_pids = q_create(0); 
+    pid_lock = lock_create("pid lock");
+#endif /* OPT_A2 */
 }
 
 /*

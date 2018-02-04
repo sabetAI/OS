@@ -1,0 +1,15 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+fork	proc_syscalls.c	/^pid_t fork(void){$/;"	f	signature:(void)
+load_elf	loadelf.c	/^load_elf(struct vnode *v, vaddr_t *entrypoint)$/;"	f	signature:(struct vnode *v, vaddr_t *entrypoint)
+load_segment	loadelf.c	/^load_segment(struct addrspace *as, struct vnode *v,$/;"	f	file:	signature:(struct addrspace *as, struct vnode *v, off_t offset, vaddr_t vaddr, size_t memsize, size_t filesize, int is_executable)
+runprogram	runprogram.c	/^runprogram(char *progname)$/;"	f	signature:(char *progname)
+sys___time	time_syscalls.c	/^sys___time(userptr_t user_seconds_ptr, userptr_t user_nanoseconds_ptr)$/;"	f	signature:(userptr_t user_seconds_ptr, userptr_t user_nanoseconds_ptr)
+sys__exit	proc_syscalls.c	/^void sys__exit(int exitcode) {$/;"	f	signature:(int exitcode)
+sys_getpid	proc_syscalls.c	/^sys_getpid(pid_t *retval)$/;"	f	signature:(pid_t *retval)
+sys_waitpid	proc_syscalls.c	/^sys_waitpid(pid_t pid,$/;"	f	signature:(pid_t pid, userptr_t status, int options, pid_t *retval)
+sys_write	file_syscalls.c	/^sys_write(int fdesc,userptr_t ubuf,unsigned int nbytes,int *retval)$/;"	f	signature:(int fdesc,userptr_t ubuf,unsigned int nbytes,int *retval)

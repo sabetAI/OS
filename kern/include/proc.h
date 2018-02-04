@@ -38,6 +38,17 @@
 
 #include <spinlock.h>
 #include <thread.h> /* required for struct threadarray */
+#include <queue.h>
+
+#if OPT_A2
+
+extern struct queue *reuse_pids;
+extern pid_t pids_n;
+
+pid_t genPID(void);
+
+#endif /* OPT_A2 */
+
 
 struct addrspace;
 struct vnode;
@@ -68,7 +79,10 @@ struct proc {
   struct vnode *console;                /* a vnode for the console device */
 #endif
 
-	/* add more material here as needed */
+#if OPT_A2
+    struct pid_t pid;
+
+#endif /* OPT_A2 */ 
 };
 
 /* This is the process structure for the kernel and for kernel-only threads. */
