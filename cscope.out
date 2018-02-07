@@ -1,4 +1,4 @@
-cscope 15 $HOME/cs350-os161/os161-1.99               0000907677
+cscope 15 $HOME/cs350-os161/os161-1.99               0000908194
 	@common/gcc-millicode/adddi3.c
 
 38 
@@ -8273,17 +8273,39 @@ t_ùlhigh_cou¡
 
 180 
 	$íãr_f‹ked_¥o˚ss
-(
+(*
+d©a1
+, 
+d©a2
+)
+
+182 
 å≠‰ame
  *
 tf
-)
-
-182 ()
-tf
+ = (å≠‰amê*Ë
+d©a1
 ;
 
 183 
+tf
+->
+tf_v0
+ = 0;
+
+184 
+tf
+->
+tf_a3
+ = 0;
+
+185 
+tf
+->
+tf_ïc
+ += 4;
+
+186 
 	}
 }
 
@@ -40611,95 +40633,95 @@ pid_t
 gíPID
 ();
 
-52 
+53 
 	gaddr•a˚
 ;
 
-53 
+54 
 	gvnode
 ;
 
-54 #ifde‡
+55 #ifde‡
 UW
 
 
-55 
+56 
 	g£m≠h‹e
 ;
 
-61 
+62 
 	s¥oc
  {
 
-62 *
+63 *
 	mp_«me
 ;
 
-63 
+64 
 •ölock
  
 	mp_lock
 ;
 
-64 
+65 
 thªad¨øy
  
 	mp_thªads
 ;
 
-67 
+68 
 addr•a˚
  *
 	mp_addr•a˚
 ;
 
-70 
+71 
 vnode
  *
 	mp_cwd
 ;
 
-72 #ifde‡
+73 #ifde‡
 UW
 
 
-78 
+79 
 vnode
  *
 	mc⁄sﬁe
 ;
 
-81 #i‡
+82 #i‡
 OPT_A2
 
 
-82 
+83 
 pid_t
  
 	mpid
 ;
 
-88 
+89 
 ¥oc
  *
 k¥oc
 ;
 
-91 #ifde‡
+92 #ifde‡
 UW
 
 
-92 
+93 
 £m≠h‹e
  *
 no_¥oc_£m
 ;
 
-96 
+97 
 ¥oc_boŸ°øp
 ();
 
-99 
+100 
 ¥oc
  *
 ¥oc_¸óã_ru≈rogøm
@@ -40707,13 +40729,13 @@ no_¥oc_£m
 «me
 );
 
-102 
+103 
 ¥oc_de°roy
 (
 ¥oc
  *proc);
 
-105 
+106 
 ¥oc_addthªad
 (
 ¥oc
@@ -40723,7 +40745,7 @@ thªad
 t
 );
 
-108 
+109 
 ¥oc_ªmthªad
 (
 thªad
@@ -40731,13 +40753,13 @@ thªad
 t
 );
 
-111 
+112 
 addr•a˚
  *
 cuΩroc_gëas
 ();
 
-114 
+115 
 addr•a˚
  *
 cuΩroc_£ès
@@ -41916,8 +41938,12 @@ OPT_A2
 70 
 pid_t
  
-f‹k
-();
+sys_f‹k
+(
+å≠‰ame
+ *
+tf
+);
 
 	@kern/include/test.h
 
@@ -56274,8 +56300,16 @@ OPT_A2
 15 
 pid_t
  
-	$f‹k
-(){
+	$sys_f‹k
+(
+å≠‰ame
+ *
+∑ª¡_tf
+, 
+pid_t
+ *
+ªtvÆ
+){
 
 17 
 ¥oc
@@ -56299,7 +56333,7 @@ NULL
 	`DEBUG
 (
 DB_SYSCALL
-, "proc_create_runprogram() failed in fork()\n");
+, "proc_create_runprogram() failed in sys_fork()\n");
 
 20  
 ENPROC
@@ -56323,7 +56357,7 @@ addr•a˚
 	`DEBUG
 (
 DB_SYSCALL
-, "as_copy() out of memory in fork()!\n");
+, "as_copy() out of memory in sys_fork()!\n");
 
 26 
 	`¥oc_de°roy
@@ -56369,7 +56403,7 @@ NULL
 	`DEBUG
 (
 DB_SYSCALL
-, "couldn't createÅrapframe in fork().\n");
+, "couldn't createÅrapframe in sys_fork().\n");
 
 36 
 	`¥oc_de°roy
@@ -56381,23 +56415,83 @@ chûd_¥oc
 ENOMEM
 ;
 
-40 
+41 
+	`mem˝y
+(
+chûd_tf
+, 
+∑ª¡_tf
+, (
+å≠‰ame
+));
+
+43 
+exô_°©us
+ = 
+	`thªad_f‹k
+(
+cuΩroc
+->
+p_«me
+, 
+chûd_¥oc
+, &
+íãr_f‹ked_¥o˚ss
+, 
+chûd_tf
+, 0);
+
+44 if(
+exô_°©us
+){
+
+45 
+	`DEBUG
+(
+DB_SYSCALL
+, "thread_fork() fail in sys_fork()")
+
+46 
+	`¥oc_de°roy
+(
+chûd_¥oc
+);
+
+47 
+	`k‰ì
+(
+chûd_tf
+);
+
+48  
+exô_°©us
+;
+
+51 
+ªtvÆ
+ = 
+chûd_¥oc
+->
+pid
+;
+
+54 
 	}
 }
 
-48 
+62 
 	$sys__exô
 (
 exôcode
 ) {
 
-50 
+64 
 addr•a˚
  *
 as
 ;
 
-51 
+65 
 ¥oc
  *
 p
@@ -56405,11 +56499,11 @@ p
 cuΩroc
 ;
 
-54 ()
+68 ()
 exôcode
 ;
 
-56 
+70 
 	`DEBUG
 (
 DB_SYSCALL
@@ -56417,7 +56511,7 @@ DB_SYSCALL
 exôcode
 );
 
-58 
+72 
 	`KASSERT
 (
 cuΩroc
@@ -56427,11 +56521,11 @@ p_addr•a˚
 NULL
 );
 
-59 
+73 
 	`as_dó˘iv©e
 ();
 
-67 
+81 
 as
  = 
 	`cuΩroc_£ès
@@ -56439,37 +56533,37 @@ as
 NULL
 );
 
-68 
+82 
 	`as_de°roy
 (
 as
 );
 
-72 
+86 
 	`¥oc_ªmthªad
 (
 cuπhªad
 );
 
-76 
+90 
 	`¥oc_de°roy
 (
 p
 );
 
-78 
+92 
 	`thªad_exô
 ();
 
-80 
+94 
 	`∑nic
 ("return fromÅhread_exit in sys_exit\n");
 
-81 
+95 
 	}
 }
 
-86 
+100 
 	$sys_gëpid
 (
 pid_t
@@ -56477,15 +56571,15 @@ pid_t
 ªtvÆ
 )
 
-90 *
+104 *
 ªtvÆ
  = 1;
 
-92 
+106 
 	}
 }
 
-97 
+111 
 	$sys_waôpid
 (
 pid_t
@@ -56493,43 +56587,43 @@ pid_t
 pid
 ,
 
-98 
+112 
 u£Ωå_t
  
 °©us
 ,
 
-99 
+113 
 ›ti⁄s
 ,
 
-100 
+114 
 pid_t
  *
 ªtvÆ
 )
 
-102 
+116 
 exô°©us
 ;
 
-103 
+117 
 ªsu…
 ;
 
-114 i‡(
+128 i‡(
 ›ti⁄s
  != 0) {
 
-115 (
+129 (
 EINVAL
 );
 
-118 
+132 
 exô°©us
  = 0;
 
-119 
+133 
 ªsu…
  = 
 	`c›yout
@@ -56539,21 +56633,21 @@ exô°©us
 °©us
 ,());
 
-120 i‡(
+134 i‡(
 ªsu…
 ) {
 
-121 (
+135 (
 ªsu…
 );
 
-123 *
+137 *
 ªtvÆ
  = 
 pid
 ;
 
-125 
+139 
 	}
 }
 

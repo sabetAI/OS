@@ -128,6 +128,10 @@ syscall(struct trapframe *tf)
 			    (userptr_t)tf->tf_a1,
 			    (int)tf->tf_a2,
 			    (pid_t *)&retval);
+#if OPT_A2
+    case SYS_fork:
+      err = sys_fork(tf, (pid_t *)&retval);
+#endif /* OPT_A2 */
 	  break;
 #endif // UW
 
@@ -168,6 +172,7 @@ syscall(struct trapframe *tf)
 	KASSERT(curthread->t_iplhigh_count == 0);
 }
 
+#if OPT_A2
 /*
  * Enter user mode for a newly forked process.
  *
@@ -177,7 +182,34 @@ syscall(struct trapframe *tf)
  * Thus, you can trash it and do things another way if you prefer.
  */
 void
+enter_forked_process(void *data1, unsigned long data2)
+{
+        struct trapframe *tf = (struct trapframe *) data1;
+        // copy trapframe to new thread's stack
+        struct trapframe stack_tf = *tf; 
+        // free the old trapframe from the heap
+        kfree(tf); 
+        (void) data2;
+        
+        stack_tf.tf_v0 = 0; // return 0 for child thread;
+        stack_tf.tf_a3 = 0; // signal no error
+        stack_tf.tf_epc += 4; 
+        
+        /* Make sure the syscall code didn't forget to lower spl */
+        KASSERT(curthread->t_curspl == 0);
+        /* ...or leak any spinlocks */
+        KASSERT(curthread->t_iplhigh_count == 0);
+
+        mips_usermode(&tf);
+        (void) data1;
+        (void) data2;
+}
+
+#else 
+void
 enter_forked_process(struct trapframe *tf)
 {
 	(void)tf;
 }
+
+#endif /* OPT_A2 */

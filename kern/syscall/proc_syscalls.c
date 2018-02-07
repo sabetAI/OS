@@ -12,7 +12,7 @@
 #include <queue.h>
 
 #if OPT_A2
-pid_t sys_fork(struct trapframe *parent_tf, pid_t *child_pid){
+pid_t sys_fork(struct trapframe *parent_tf, pid_t *retval){
     /* Create new process struct */
     struct proc *child_proc = proc_create_runprogram(curproc->p_name);
     if (child_proc == NULL){
@@ -37,8 +37,10 @@ pid_t sys_fork(struct trapframe *parent_tf, pid_t *child_pid){
         return ENOMEM;
     }
 
+    // synch issues?
     memcpy(child_tf, parent_tf, sizeof(struct trapframe));
-    int exit_status = thread_fork(curproc->p_name, child_proc, &enter_forked_process, child_tf, 0);
+
+    int exit_status = thread_fork(curproc->p_name, child_proc, &enter_forked_process, child_tf, -1);
     if(exit_status){
         DEBUG(DB_SYSCALL, "thread_fork() fail in sys_fork()")
         proc_destroy(child_proc);
@@ -46,7 +48,8 @@ pid_t sys_fork(struct trapframe *parent_tf, pid_t *child_pid){
         return exit_status; 
     }
 
-    *child_pid = child_proc->pid;
+    retval = child_proc->pid;
+
     return 0;
 }
 
