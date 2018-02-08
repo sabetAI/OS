@@ -39,6 +39,9 @@
 #include <spinlock.h>
 #include <thread.h> /* required for struct threadarray */
 #include <queue.h>
+#include <opt-A2.h>
+#include <kern/types.h>
+
 
 #if OPT_A2
 
@@ -80,7 +83,7 @@ struct proc {
 #endif
 
 #if OPT_A2
-    struct pid_t pid;
+    pid_t pid;
 
 #endif /* OPT_A2 */ 
 };

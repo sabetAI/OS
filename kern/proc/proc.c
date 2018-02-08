@@ -72,13 +72,13 @@ struct semaphore *no_proc_sem;
 
 #if OPT_A2
 struct queue *reuse_pids;
-pid_t pids_n = 1;
+pid_t pids_n = 0;
 struct lock *pid_lock; 
 
 pid_t genPID(void){
    lock_acquire(pid_lock);
    if(!q_empty(reuse_pids)){
-        pid_t pid = q_remhead(reuse_pids);
+        pid_t pid = *(pid_t *)q_remhead(reuse_pids);
         lock_release(pid_lock);
         return pid;
    } else {
@@ -233,6 +233,7 @@ proc_bootstrap(void)
 #if OPT_A2
     reuse_pids = q_create(0); 
     pid_lock = lock_create("pid lock");
+
 #endif /* OPT_A2 */
 }
 
@@ -296,6 +297,11 @@ proc_create_runprogram(const char *name)
 	proc_count++;
 	V(proc_count_mutex);
 #endif // UW
+    
+#if OPT_A2
+
+    proc->pid = genPID();    
+#endif /* OPT_A2 */
 
 	return proc;
 }

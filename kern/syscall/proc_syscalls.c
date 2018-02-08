@@ -10,6 +10,9 @@
 #include <addrspace.h>
 #include <copyinout.h>
 #include <queue.h>
+#include <opt-A2.h>
+#include <mips/trapframe.h>
+
 
 #if OPT_A2
 pid_t sys_fork(struct trapframe *parent_tf, pid_t *retval){
@@ -20,15 +23,14 @@ pid_t sys_fork(struct trapframe *parent_tf, pid_t *retval){
         return ENPROC;
     }
     /* copy old address spaces to new one */
-    struct addrspace *newas;
+    struct addrspace *newas[1];
     if (as_copy(curproc_getas(), newas) != 0){
         DEBUG(DB_SYSCALL, "as_copy() out of memory in sys_fork()!\n");
         proc_destroy(child_proc);
         return ENOMEM;
     }
 
-    child_proc->p_addrspace = newas; // don't need to use lock because not shared
-    child_proc->pid = genPID();    
+    child_proc->p_addrspace = *newas; // don't need to use lock because not shared
    
     struct trapframe *child_tf = kmalloc(sizeof(struct trapframe));
     if (child_tf == NULL){
@@ -40,15 +42,15 @@ pid_t sys_fork(struct trapframe *parent_tf, pid_t *retval){
     // synch issues?
     memcpy(child_tf, parent_tf, sizeof(struct trapframe));
 
-    int exit_status = thread_fork(curproc->p_name, child_proc, &enter_forked_process, child_tf, -1);
+    int exit_status = thread_fork(curproc->p_name, child_proc, enter_forked_process, child_tf, -1);
     if(exit_status){
-        DEBUG(DB_SYSCALL, "thread_fork() fail in sys_fork()")
+        DEBUG(DB_SYSCALL, "thread_fork() fail in sys_fork()");
         proc_destroy(child_proc);
         kfree(child_tf);
         return exit_status; 
     }
 
-    retval = child_proc->pid;
+    *retval = child_proc->pid;
 
     return 0;
 }
@@ -101,7 +103,7 @@ sys_getpid(pid_t *retval)
 {
   /* for now, this is just a stub that always returns a PID of 1 */
   /* you need to fix this to make it work properly */
-  *retval = 1;
+  *retval = curproc->pid;
   return(0);
 }
 

@@ -35,7 +35,7 @@
 #include <thread.h>
 #include <current.h>
 #include <syscall.h>
-
+#include <opt-A2.h>
 
 /*
  * System call dispatcher.
@@ -200,7 +200,7 @@ enter_forked_process(void *data1, unsigned long data2)
         /* ...or leak any spinlocks */
         KASSERT(curthread->t_iplhigh_count == 0);
 
-        mips_usermode(&tf);
+        mips_usermode(&stack_tf);
         (void) data1;
         (void) data2;
 }
