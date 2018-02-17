@@ -50,7 +50,6 @@
 #include <vfs.h>
 #include <synch.h>
 #include <kern/fcntl.h>  
-#include <thread.h>
 
 /*
  * The process for the kernel; this holds all the kernel-only threads.
@@ -92,13 +91,6 @@ pid_t genPID(void){
    }
 }
 
-struct pt_entry{
-    pid_t pid;
-    pid_t parent_pid;
-    threadstate_t status;
-    int exit_status;
-};
-
 
 struct pt_entry *create_pt_entry(pid_t parent_pid){
     struct pt_entry *entry = kmalloc(sizeof(struct pt_entry));
@@ -108,28 +100,28 @@ struct pt_entry *create_pt_entry(pid_t parent_pid){
     entry->pid = genPID();
     entry->parent_pid = parent_pid;
     entry->status = S_RUN;
+    return entry;
     // should set exit status?
 }
 
 void add_pt_entry(pid_t pid){
-    struct pt_entry *entry = create_pt_entry(pid_t pid);
+    struct pt_entry *entry = create_pt_entry(pid);
     array_add(proc_table, entry, NULL);
 }
 
 void remove_pt_entry(pid_t pid){
-    for (int i = 0; i < array_num(proc_table); i++){
+    for (unsigned int i = 0; i < array_num(proc_table); i++){
         struct pt_entry *entry = array_get(proc_table, i);
         if (entry->pid == pid){
-            kfree(pt_entry);
+            kfree(entry);
             array_remove(proc_table, i);
         }
-        
     }
 }
 
 
 struct pt_entry *get_ptable_entry(pid_t pid){
-    for (int i = 0; i < array_num(proc_table); i++){
+    for (unsigned int i = 0; i < array_num(proc_table); i++){
         struct pt_entry *entry = array_get(proc_table, i);
         if (entry->pid == pid){
            return entry; 
@@ -140,7 +132,7 @@ struct pt_entry *get_ptable_entry(pid_t pid){
 }
 
 void update_pt_children(pid_t pid){
-    for (int i = 0; i < array_num(proc_table); i++){
+    for (unsigned int i = 0; i < array_num(proc_table); i++){
         struct pt_entry *entry = array_get(proc_table, i);
         if (entry->parent_pid == pid 
                 && entry->status == S_ZOMBIE){
@@ -148,7 +140,7 @@ void update_pt_children(pid_t pid){
             *child_pid = entry->pid;
 
             lock_acquire(ptable_lock);
-            remove_pt_entry(child_pid);
+            remove_pt_entry(*child_pid);
             lock_release(ptable_lock);
 
             lock_acquire(pid_lock);

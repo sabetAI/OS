@@ -1,4 +1,4 @@
-cscope 15 $HOME/cs350-os161/os161-1.99               0000961384
+cscope 15 $HOME/cs350-os161/os161-1.99               0000962218
 	@build/install/hostinclude/hostcompat.h
 
 31 
@@ -47690,32 +47690,50 @@ pids_n
 ;
 
 52 
-±_íåy
-;
-
-53 
 ¨øy
  *
 ¥oc_èbÀ
 ;
 
-55 
+53 
+lock
+ *
+pid_lock
+;
+
+54 
+lock
+ *
+±abÀ_lock
+;
+
+55 
+cv
+ *
+±abÀ_cv
+;
+
+56 
+±_íåy
+;
+
+58 
 pid_t
  
 gíPID
 ();
 
-56 
+59 
 ±_íåy
  *
 ¸óã_±_íåy
 (
 pid_t
  
-pid
+∑ª¡_pid
 );
 
-57 
+60 
 add_±_íåy
 (
 pid_t
@@ -47723,7 +47741,7 @@ pid_t
 pid
 );
 
-58 
+61 
 ªmove_±_íåy
 (
 pid_t
@@ -47731,7 +47749,7 @@ pid_t
 pid
 );
 
-59 
+62 
 ±_íåy
  *
 gë_±abÀ_íåy
@@ -47741,7 +47759,7 @@ pid_t
 pid
 );
 
-60 
+63 
 upd©e_±_chûdªn
 (
 pid_t
@@ -47749,107 +47767,101 @@ pid_t
 pid
 );
 
-65 
+68 
 	gaddr•a˚
 ;
 
-66 
+69 
 	gvnode
 ;
 
-67 #ifde‡
+70 #ifde‡
 UW
 
 
-68 
+71 
 	g£m≠h‹e
 ;
 
-74 
+77 
 	s¥oc
  {
 
-75 *
+78 *
 	mp_«me
 ;
 
-76 
+79 
 •ölock
  
 	mp_lock
 ;
 
-77 
+80 
 thªad¨øy
  
 	mp_thªads
 ;
 
-80 
+83 
 addr•a˚
  *
 	mp_addr•a˚
 ;
 
-83 
+86 
 vnode
  *
 	mp_cwd
 ;
 
-85 #ifde‡
+88 #ifde‡
 UW
 
 
-91 
+94 
 vnode
  *
 	mc⁄sﬁe
 ;
 
-94 #i‡
+96 #i‡
 OPT_A2
 
 
-95 
+97 
 pid_t
  
 	mpid
 ;
 
-96 
-¥oc_èbÀ
+98 
+cv
  *
-	m∑ª¡
+	mwaô_cv
 ;
 
-97 
-¨øy
- *
-	mchûdªn
-;
-
-103 
+104 
 ¥oc
  *
 k¥oc
 ;
 
-106 #ifde‡
+107 #ifde‡
 UW
 
 
-107 
+108 
 £m≠h‹e
  *
 no_¥oc_£m
 ;
 
-111 
+112 
 ¥oc_boŸ°øp
 ();
 
-114 
+115 
 ¥oc
  *
 ¥oc_¸óã_ru≈rogøm
@@ -47857,13 +47869,13 @@ no_¥oc_£m
 «me
 );
 
-117 
+118 
 ¥oc_de°roy
 (
 ¥oc
  *proc);
 
-120 
+121 
 ¥oc_addthªad
 (
 ¥oc
@@ -47873,7 +47885,7 @@ thªad
 t
 );
 
-123 
+124 
 ¥oc_ªmthªad
 (
 thªad
@@ -47881,13 +47893,13 @@ thªad
 t
 );
 
-126 
+127 
 addr•a˚
  *
 cuΩroc_gëas
 ();
 
-129 
+130 
 addr•a˚
  *
 cuΩroc_£ès
@@ -54869,95 +54881,91 @@ NULL
 	~<kîn/f˙é.h
 >
 
-53 
-	~<thªad.h
->
-
-58 
+57 
 ¥oc
  *
 	gk¥oc
 ;
 
-63 #ifde‡
+62 #ifde‡
 UW
 
 
-65 vﬁ©ûê
+64 vﬁ©ûê
 	g¥oc_cou¡
 ;
 
-68 
+67 
 £m≠h‹e
  *
 	g¥oc_cou¡_muãx
 ;
 
-70 
+69 
 £m≠h‹e
  *
 	gno_¥oc_£m
 ;
 
-74 #i‡
+73 #i‡
 OPT_A2
 
 
-75 
+74 
 queue
  *
 	gªu£_pids
 ;
 
-76 
+75 
 pid_t
  
 	gpids_n
  = 0;
 
-77 
+76 
 lock
  *
 	gpid_lock
 ;
 
-78 
+77 
 lock
  *
 	g±abÀ_lock
 ;
 
-79 
+78 
 cv
  *
 	g±abÀ_cv
 ;
 
-80 
+79 
 ¨øy
  *
 	g¥oc_èbÀ
 ;
 
-82 
+81 
 pid_t
  
 	$gíPID
 (){
 
-83 
+82 
 	`lock_acquúe
 (
 pid_lock
 );
 
-84 if(!
+83 if(!
 	`q_em±y
 (
 ªu£_pids
 )){
 
-85 
+84 
 pid_t
  
 pid
@@ -54967,17 +54975,17 @@ pid
 ªu£_pids
 );
 
-86 
+85 
 	`lock_ªÀa£
 (
 pid_lock
 );
 
-87  
+86  
 pid
 ;
 
-89 
+88 
 pid_t
  
 pid
@@ -54985,52 +54993,54 @@ pid
 pids_n
 ;
 
-90 
+89 
 	`lock_ªÀa£
 (
 pid_lock
 );
 
-91  
+90  
 pid
 ;
 
-93 
+92 
 	}
 }
 
-95 
+94 
 	s±_íåy
 {
 
-96 
+95 
 pid_t
  
 	mpid
 ;
 
-97 
+96 
 pid_t
  
 	m∑ª¡_pid
 ;
 
-98 
+97 
 thªad°©e_t
  
 	m°©us
 ;
 
-99 
+98 
 	mexô_°©us
 ;
 
-102 
-	$add_±_íåy
+102 
+±_íåy
+ *
+	$¸óã_±_íåy
 (
 pid_t
  
-pid
+∑ª¡_pid
 ){
 
 103 
@@ -55038,14 +55048,68 @@ pid
  *
 íåy
  = 
-	`¸óã_±_íåy
+	`kmÆloc
+((pt_entry));
+
+104 i‡(
+íåy
+ =
+NULL
+){
+
+105 
+	`∑nic
+("create_pt_entry failedÅoállocate memory!\n");
+
+107 
+íåy
+->
+pid
+ = 
+	`gíPID
+();
+
+108 
+íåy
+->
+∑ª¡_pid
+ =Öarent_pid;
+
+109 
+íåy
+->
+°©us
+ = 
+S_RUN
+;
+
+110  
+íåy
+;
+
+112 
+	}
+}
+
+114 
+	$add_±_íåy
 (
 pid_t
  
 pid
+){
+
+115 
+±_íåy
+ *
+íåy
+ = 
+	`¸óã_±_íåy
+(
+pid
 );
 
-104 
+116 
 	`¨øy_add
 (
 ¥oc_èbÀ
@@ -55055,11 +55119,11 @@ pid
 NULL
 );
 
-105 
+117 
 	}
 }
 
-107 
+119 
 	$ªmove_±_íåy
 (
 pid_t
@@ -55067,61 +55131,7 @@ pid_t
 pid
 ){
 
-108 
-i
- = 0; i < 
-	`¨øy_num
-(
-¥oc_èbÀ
-); i++){
-
-109 
-±_íåy
- *
-íåy
- = 
-	`¨øy_gë
-(
-¥oc_èbÀ
-, 
-i
-);
-
-110 i‡(
-íåy
-->
-pid
- ==Öid){
-
-111 
-	`k‰ì
-(
-±_íåy
-);
-
-112 
-	`¨øy_ªmove
-(
-¥oc_èbÀ
-, 
-i
-);
-
-116 
-	}
-}
-
-119 
-±_íåy
- *
-	$gë_±abÀ_íåy
-(
-pid_t
- 
-pid
-){
-
-120 
+120 
 i
  = 0; i < 
 	`¨øy_num
@@ -55147,27 +55157,35 @@ i
 pid
  ==Öid){
 
-123  
+123 
+	`k‰ì
+(
 íåy
-;
+);
 
-127  
-NULL
-;
+124 
+	`¨øy_ªmove
+(
+¥oc_èbÀ
+, 
+i
+);
 
-128 
+127 
 	}
 }
 
-130 
-	$upd©e_±_chûdªn
+130 
+±_íåy
+ *
+	$gë_±abÀ_íåy
 (
 pid_t
  
 pid
 ){
 
-131 
+131 
 i
  = 0; i < 
 	`¨øy_num
@@ -55190,12 +55208,58 @@ i
 133 i‡(
 íåy
 ->
+pid
+ ==Öid){
+
+134  
+íåy
+;
+
+138  
+NULL
+;
+
+139 
+	}
+}
+
+141 
+	$upd©e_±_chûdªn
+(
+pid_t
+ 
+pid
+){
+
+142 
+i
+ = 0; i < 
+	`¨øy_num
+(
+¥oc_èbÀ
+); i++){
+
+143 
+±_íåy
+ *
+íåy
+ = 
+	`¨øy_gë
+(
+¥oc_èbÀ
+, 
+i
+);
+
+144 i‡(
+íåy
+->
 ∑ª¡_pid
  =
 pid
 
 
-134 && 
+145 && 
 íåy
 ->
 °©us
@@ -55203,7 +55267,7 @@ pid
 S_ZOMBIE
 ){
 
-135 
+146 
 pid_t
  *
 chûd_pid
@@ -55211,7 +55275,7 @@ chûd_pid
 	`kmÆloc
 ((pid_t));
 
-136 *
+147 *
 chûd_pid
  = 
 íåy
@@ -55219,31 +55283,31 @@ chûd_pid
 pid
 ;
 
-138 
+149 
 	`lock_acquúe
 (
 ±abÀ_lock
 );
 
-139 
+150 
 	`ªmove_±_íåy
-(
+(*
 chûd_pid
 );
 
-140 
+151 
 	`lock_ªÀa£
 (
 ±abÀ_lock
 );
 
-142 
+153 
 	`lock_acquúe
 (
 pid_lock
 );
 
-143 
+154 
 	`q_addèû
 (
 ªu£_pids
@@ -55251,13 +55315,13 @@ pid_lock
 chûd_pid
 );
 
-144 
+155 
 	`lock_ªÀa£
 (
 pid_lock
 );
 
-145 } i‡(
+156 } i‡(
 íåy
 ->
 ∑ª¡_pid
@@ -55265,7 +55329,7 @@ pid_lock
 pid
 ) {
 
-146 
+157 
 íåy
 ->
 ∑ª¡_pid
@@ -55273,41 +55337,41 @@ pid
 PID_ORPHAN
 ;
 
-149 
+160 
 	}
 }
 
-159 
+170 
 ¥oc
  *
 
-160 
+171 
 	$¥oc_¸óã
 (c⁄° *
 «me
 )
 
-162 
+173 
 ¥oc
  *proc;
 
-164 
+175 
 ¥oc
  = 
 	`kmÆloc
 ((*proc));
 
-165 i‡(
+176 i‡(
 ¥oc
  =
 NULL
 ) {
 
-166  
+177  
 NULL
 ;
 
-168 
+179 
 ¥oc
 ->
 p_«me
@@ -55317,7 +55381,7 @@ p_«me
 «me
 );
 
-169 i‡(
+180 i‡(
 ¥oc
 ->
 p_«me
@@ -55325,17 +55389,17 @@ p_«me
 NULL
 ) {
 
-170 
+181 
 	`k‰ì
 (
 ¥oc
 );
 
-171  
+182  
 NULL
 ;
 
-174 
+185 
 	`thªad¨øy_öô
 (&
 ¥oc
@@ -55343,7 +55407,7 @@ NULL
 p_thªads
 );
 
-175 
+186 
 	`•ölock_öô
 (&
 ¥oc
@@ -55351,7 +55415,7 @@ p_thªads
 p_lock
 );
 
-178 
+189 
 ¥oc
 ->
 p_addr•a˚
@@ -55359,7 +55423,7 @@ p_addr•a˚
 NULL
 ;
 
-181 
+192 
 ¥oc
 ->
 p_cwd
@@ -55367,11 +55431,11 @@ p_cwd
 NULL
 ;
 
-183 #ifde‡
+194 #ifde‡
 UW
 
 
-184 
+195 
 ¥oc
 ->
 c⁄sﬁe
@@ -55379,21 +55443,21 @@ c⁄sﬁe
 NULL
 ;
 
-187  
+198  
 ¥oc
 ;
 
-188 
+199 
 	}
 }
 
-194 
+205 
 	$¥oc_de°roy
 (
 ¥oc
  *proc)
 
-205 
+216 
 	`KASSERT
 (
 ¥oc
@@ -55401,7 +55465,7 @@ NULL
 NULL
 );
 
-206 
+217 
 	`KASSERT
 (
 ¥oc
@@ -55409,13 +55473,13 @@ NULL
 k¥oc
 );
 
-215 i‡(
+226 i‡(
 ¥oc
 ->
 p_cwd
 ) {
 
-216 
+227 
 	`VOP_DECREF
 (
 ¥oc
@@ -55423,7 +55487,7 @@ p_cwd
 p_cwd
 );
 
-217 
+228 
 ¥oc
 ->
 p_cwd
@@ -55431,27 +55495,27 @@ p_cwd
 NULL
 ;
 
-221 #i‚de‡
+232 #i‚de‡
 UW
 
 
-222 i‡(
+233 i‡(
 ¥oc
 ->
 p_addr•a˚
 ) {
 
-233 
+244 
 addr•a˚
  *
 as
 ;
 
-235 
+246 
 	`as_dó˘iv©e
 ();
 
-236 
+247 
 as
  = 
 	`cuΩroc_£ès
@@ -55459,23 +55523,23 @@ as
 NULL
 );
 
-237 
+248 
 	`as_de°roy
 (
 as
 );
 
-241 #ifde‡
+252 #ifde‡
 UW
 
 
-242 i‡(
+253 i‡(
 ¥oc
 ->
 c⁄sﬁe
 ) {
 
-243 
+254 
 	`vfs_˛o£
 (
 ¥oc
@@ -55483,7 +55547,7 @@ c⁄sﬁe
 c⁄sﬁe
 );
 
-247 
+258 
 	`thªad¨øy_˛ónup
 (&
 ¥oc
@@ -55491,7 +55555,7 @@ c⁄sﬁe
 p_thªads
 );
 
-248 
+259 
 	`•ölock_˛ónup
 (&
 ¥oc
@@ -55499,7 +55563,7 @@ p_thªads
 p_lock
 );
 
-250 
+261 
 	`k‰ì
 (
 ¥oc
@@ -55507,129 +55571,129 @@ p_lock
 p_«me
 );
 
-251 
+262 
 	`k‰ì
 (
 ¥oc
 );
 
-253 #ifde‡
+264 #ifde‡
 UW
 
 
-258 
+269 
 	`P
 (
 ¥oc_cou¡_muãx
 );
 
-259 
+270 
 	`KASSERT
 (
 ¥oc_cou¡
  > 0);
 
-260 
+271 
 ¥oc_cou¡
 --;
 
-262 i‡(
+273 i‡(
 ¥oc_cou¡
  == 0) {
 
-263 
+274 
 	`V
 (
 no_¥oc_£m
 );
 
-265 
+276 
 	`V
 (
 ¥oc_cou¡_muãx
 );
 
-269 
+280 
 	}
 }
 
-275 
+286 
 	$¥oc_boŸ°øp
 ()
 
-277 
+288 
 k¥oc
  = 
 	`¥oc_¸óã
 ("[kernel]");
 
-278 i‡(
+289 i‡(
 k¥oc
  =
 NULL
 ) {
 
-279 
+290 
 	`∑nic
 ("proc_create for kproc failed\n");
 
-281 #ifde‡
+292 #ifde‡
 UW
 
 
-282 
+293 
 ¥oc_cou¡
  = 0;
 
-283 
+294 
 ¥oc_cou¡_muãx
  = 
 	`£m_¸óã
 ("proc_count_mutex",1);
 
-284 i‡(
+295 i‡(
 ¥oc_cou¡_muãx
  =
 NULL
 ) {
 
-285 
+296 
 	`∑nic
 ("couldÇot createÖroc_count_mutex semaphore\n");
 
-287 
+298 
 no_¥oc_£m
  = 
 	`£m_¸óã
 ("no_proc_sem",0);
 
-288 i‡(
+299 i‡(
 no_¥oc_£m
  =
 NULL
 ) {
 
-289 
+300 
 	`∑nic
 ("couldÇot createÇo_proc_sem semaphore\n");
 
-292 #i‡
+303 #i‡
 OPT_A2
 
 
-293 
+304 
 ªu£_pids
  = 
 	`q_¸óã
 (0);
 
-295 
+306 
 pid_lock
  = 
 	`lock_¸óã
 ("pidÜock");
 
-296 i‡(
+307 i‡(
 pid_lock
  =
 NULL
@@ -55637,13 +55701,13 @@ NULL
 	`∑nic
 ("coudÇot ceateÖid_lock\n");
 
-298 
+309 
 ±abÀ_lock
  = 
 	`lock_¸óã
 ("processÅableÜock");
 
-299 i‡(
+310 i‡(
 ±abÀ_lock
  =
 NULL
@@ -55651,13 +55715,13 @@ NULL
 	`∑nic
 ("couldÇot createÖtable_lock\n");
 
-301 
+312 
 ±abÀ_cv
  = 
 	`cv_¸óã
 ("processÅable condition variable");
 
-302 i‡(
+313 i‡(
 ±abÀ_cv
  =
 NULL
@@ -55665,41 +55729,41 @@ NULL
 	`∑nic
 ("couldÇot createÖtable_cv\n");
 
-305 
+316 
 ¥oc_èbÀ
  = 
 	`¨øy_¸óã
 ();
 
-306 
+317 
 	`¨øy_öô
 (
 ¥oc_èbÀ
 );
 
-309 
+320 
 	}
 }
 
-317 
+328 
 ¥oc
  *
 
-318 
+329 
 	$¥oc_¸óã_ru≈rogøm
 (c⁄° *
 «me
 )
 
-320 
+331 
 ¥oc
  *proc;
 
-321 *
+332 *
 c⁄sﬁe_∑th
 ;
 
-323 
+334 
 ¥oc
  = 
 	`¥oc_¸óã
@@ -55707,37 +55771,37 @@ c⁄sﬁe_∑th
 «me
 );
 
-324 i‡(
+335 i‡(
 ¥oc
  =
 NULL
 ) {
 
-325  
+336  
 NULL
 ;
 
-328 #ifde‡
+339 #ifde‡
 UW
 
 
-330 
+341 
 c⁄sﬁe_∑th
  = 
 	`k°rdup
 ("con:");
 
-331 i‡(
+342 i‡(
 c⁄sﬁe_∑th
  =
 NULL
 ) {
 
-332 
+343 
 	`∑nic
 ("unableÅo copy consoleÖathÇame duringÖrocess creation\n");
 
-334 i‡(
+345 i‡(
 	`vfs_›í
 (
 c⁄sﬁe_∑th
@@ -55749,17 +55813,17 @@ O_WRONLY
 c⁄sﬁe
 ))) {
 
-335 
+346 
 	`∑nic
 ("unableÅo openÅhe console duringÖrocess creation\n");
 
-337 
+348 
 	`k‰ì
 (
 c⁄sﬁe_∑th
 );
 
-342 
+353 
 ¥oc
 ->
 p_addr•a˚
@@ -55767,11 +55831,11 @@ p_addr•a˚
 NULL
 ;
 
-346 #ifde‡
+357 #ifde‡
 UW
 
 
-350 i‡(
+361 i‡(
 cuΩroc
 ->
 p_cwd
@@ -55779,7 +55843,7 @@ p_cwd
 NULL
 ) {
 
-351 
+362 
 	`VOP_INCREF
 (
 cuΩroc
@@ -55787,7 +55851,7 @@ cuΩroc
 p_cwd
 );
 
-352 
+363 
 ¥oc
 ->
 p_cwd
@@ -55795,7 +55859,7 @@ p_cwd
 cuΩroc
 ->p_cwd;
 
-355 
+366 
 	`•ölock_acquúe
 (&
 cuΩroc
@@ -55803,7 +55867,7 @@ cuΩroc
 p_lock
 );
 
-356 i‡(
+367 i‡(
 cuΩroc
 ->
 p_cwd
@@ -55811,7 +55875,7 @@ p_cwd
 NULL
 ) {
 
-357 
+368 
 	`VOP_INCREF
 (
 cuΩroc
@@ -55819,7 +55883,7 @@ cuΩroc
 p_cwd
 );
 
-358 
+369 
 ¥oc
 ->
 p_cwd
@@ -55827,7 +55891,7 @@ p_cwd
 cuΩroc
 ->p_cwd;
 
-360 
+371 
 	`•ölock_ªÀa£
 (&
 cuΩroc
@@ -55835,31 +55899,31 @@ cuΩroc
 p_lock
 );
 
-363 #ifde‡
+374 #ifde‡
 UW
 
 
-367 
+378 
 	`P
 (
 ¥oc_cou¡_muãx
 );
 
-368 
+379 
 ¥oc_cou¡
 ++;
 
-369 
+380 
 	`V
 (
 ¥oc_cou¡_muãx
 );
 
-372 #i‡
+383 #i‡
 OPT_A2
 
 
-373 
+384 
 ¥oc
 ->
 pid
@@ -55867,13 +55931,13 @@ pid
 	`gíPID
 ();
 
-375 
+386 
 	`lock_acquúe
 (
 ±abÀ_lock
 );
 
-376 
+387 
 	`add_±_íåy
 (
 ¥oc
@@ -55881,21 +55945,21 @@ pid
 pid
 );
 
-377 
+388 
 	`lock_acquúe
 (
 ±abÀ_lock
 );
 
-381  
+392  
 ¥oc
 ;
 
-382 
+393 
 	}
 }
 
-389 
+400 
 	$¥oc_addthªad
 (
 ¥oc
@@ -55905,11 +55969,11 @@ thªad
 t
 )
 
-391 
+402 
 ªsu…
 ;
 
-393 
+404 
 	`KASSERT
 (
 t
@@ -55919,7 +55983,7 @@ t_¥oc
 NULL
 );
 
-395 
+406 
 	`•ölock_acquúe
 (&
 ¥oc
@@ -55927,7 +55991,7 @@ NULL
 p_lock
 );
 
-396 
+407 
 ªsu…
  = 
 	`thªad¨øy_add
@@ -55941,7 +56005,7 @@ t
 NULL
 );
 
-397 
+408 
 	`•ölock_ªÀa£
 (&
 ¥oc
@@ -55949,15 +56013,15 @@ NULL
 p_lock
 );
 
-398 i‡(
+409 i‡(
 ªsu…
 ) {
 
-399  
+410  
 ªsu…
 ;
 
-401 
+412 
 t
 ->
 t_¥oc
@@ -55965,11 +56029,11 @@ t_¥oc
 ¥oc
 ;
 
-403 
+414 
 	}
 }
 
-410 
+421 
 	$¥oc_ªmthªad
 (
 thªad
@@ -55977,17 +56041,17 @@ thªad
 t
 )
 
-412 
+423 
 ¥oc
  *proc;
 
-413 
+424 
 i
 , 
 num
 ;
 
-415 
+426 
 ¥oc
  = 
 t
@@ -55995,7 +56059,7 @@ t
 t_¥oc
 ;
 
-416 
+427 
 	`KASSERT
 (
 ¥oc
@@ -56003,7 +56067,7 @@ t_¥oc
 NULL
 );
 
-418 
+429 
 	`•ölock_acquúe
 (&
 ¥oc
@@ -56011,7 +56075,7 @@ NULL
 p_lock
 );
 
-420 
+431 
 num
  = 
 	`thªad¨øy_num
@@ -56021,13 +56085,13 @@ num
 p_thªads
 );
 
-421 
+432 
 i
 =0; i<
 num
 ; i++) {
 
-422 i‡(
+433 i‡(
 	`thªad¨øy_gë
 (&
 ¥oc
@@ -56039,7 +56103,7 @@ i
 t
 ) {
 
-423 
+434 
 	`thªad¨øy_ªmove
 (&
 ¥oc
@@ -56049,7 +56113,7 @@ p_thªads
 i
 );
 
-424 
+435 
 	`•ölock_ªÀa£
 (&
 ¥oc
@@ -56057,7 +56121,7 @@ i
 p_lock
 );
 
-425 
+436 
 t
 ->
 t_¥oc
@@ -56065,7 +56129,7 @@ t_¥oc
 NULL
 ;
 
-430 
+441 
 	`•ölock_ªÀa£
 (&
 ¥oc
@@ -56073,7 +56137,7 @@ NULL
 p_lock
 );
 
-431 
+442 
 	`∑nic
 ("Thªad (%pËha†esˇ≥d from it†¥o˚s†(%p)\n", 
 t
@@ -56081,39 +56145,39 @@ t
 ¥oc
 );
 
-432 
+443 
 	}
 }
 
-439 
+450 
 addr•a˚
  *
 
-440 
+451 
 	$cuΩroc_gëas
 ()
 
-442 
+453 
 addr•a˚
  *
 as
 ;
 
-443 #ifde‡
+454 #ifde‡
 UW
 
 
-447 i‡(
+458 i‡(
 cuΩroc
  =
 NULL
 ) {
 
-448  
+459  
 NULL
 ;
 
-452 
+463 
 	`•ölock_acquúe
 (&
 cuΩroc
@@ -56121,7 +56185,7 @@ cuΩroc
 p_lock
 );
 
-453 
+464 
 as
  = 
 cuΩroc
@@ -56129,7 +56193,7 @@ cuΩroc
 p_addr•a˚
 ;
 
-454 
+465 
 	`•ölock_ªÀa£
 (&
 cuΩroc
@@ -56137,19 +56201,19 @@ cuΩroc
 p_lock
 );
 
-455  
+466  
 as
 ;
 
-456 
+467 
 	}
 }
 
-462 
+473 
 addr•a˚
  *
 
-463 
+474 
 	$cuΩroc_£ès
 (
 addr•a˚
@@ -56157,19 +56221,19 @@ addr•a˚
 √was
 )
 
-465 
+476 
 addr•a˚
  *
 ﬁdas
 ;
 
-466 
+477 
 ¥oc
  *¥o¯
 cuΩroc
 ;
 
-468 
+479 
 	`•ölock_acquúe
 (&
 ¥oc
@@ -56177,7 +56241,7 @@ cuΩroc
 p_lock
 );
 
-469 
+480 
 ﬁdas
  = 
 ¥oc
@@ -56185,7 +56249,7 @@ p_lock
 p_addr•a˚
 ;
 
-470 
+481 
 ¥oc
 ->
 p_addr•a˚
@@ -56193,7 +56257,7 @@ p_addr•a˚
 √was
 ;
 
-471 
+482 
 	`•ölock_ªÀa£
 (&
 ¥oc
@@ -56201,11 +56265,11 @@ p_addr•a˚
 p_lock
 );
 
-472  
+483  
 ﬁdas
 ;
 
-473 
+484 
 	}
 }
 
@@ -63815,11 +63879,15 @@ e_íåy
 	~<mùs/å≠‰ame.h
 >
 
-17 #i‡
+15 
+	~<synch.h
+>
+
+18 #i‡
 OPT_A2
 
 
-18 
+19 
 pid_t
  
 	$sys_f‹k
@@ -63833,7 +63901,7 @@ pid_t
 ªtvÆ
 ){
 
-20 
+21 
 ¥oc
  *
 chûd_¥oc
@@ -63845,29 +63913,29 @@ cuΩroc
 p_«me
 );
 
-21 i‡(
+22 i‡(
 chûd_¥oc
  =
 NULL
 ){
 
-22 
+23 
 	`DEBUG
 (
 DB_SYSCALL
 , "proc_create_runprogram() failed in sys_fork()\n");
 
-24  
+25  
 ENPROC
 ;
 
-27 
+28 
 addr•a˚
  *
 √was
 [1];
 
-28 i‡(
+29 i‡(
 	`as_c›y
 (
 	`cuΩroc_gëas
@@ -63875,19 +63943,19 @@ addr•a˚
 √was
 ) != 0){
 
-29 
+30 
 	`DEBUG
 (
 DB_SYSCALL
 , "as_copy() out of memory in sys_fork()!\n");
 
-30 
+31 
 	`lock_acquúe
 (
 ±abÀ_lock
 );
 
-31 
+32 
 	`ªmove_±_íåy
 (
 chûd_¥oc
@@ -63895,23 +63963,23 @@ chûd_¥oc
 pid
 );
 
-32 
+33 
 	`lock_ªÀa£
 (
 ±abÀ_lock
 );
 
-34 
+35 
 	`¥oc_de°roy
 (
 chûd_¥oc
 );
 
-35  
+36  
 ENOMEM
 ;
 
-38 
+39 
 chûd_¥oc
 ->
 p_addr•a˚
@@ -63919,7 +63987,7 @@ p_addr•a˚
 √was
 ;
 
-40 
+41 
 å≠‰ame
  *
 chûd_tf
@@ -63927,25 +63995,25 @@ chûd_tf
 	`kmÆloc
 ((trapframe));
 
-41 i‡(
+42 i‡(
 chûd_tf
  =
 NULL
 ){
 
-42 
+43 
 	`DEBUG
 (
 DB_SYSCALL
 , "couldn't createÅrapframe in sys_fork().\n");
 
-43 
+44 
 	`lock_acquúe
 (
 ±abÀ_lock
 );
 
-44 
+45 
 	`ªmove_±_íåy
 (
 chûd_¥oc
@@ -63953,23 +64021,23 @@ chûd_¥oc
 pid
 );
 
-45 
+46 
 	`lock_ªÀa£
 (
 ±abÀ_lock
 );
 
-47 
+48 
 	`¥oc_de°roy
 (
 chûd_¥oc
 );
 
-48  
+49  
 ENOMEM
 ;
 
-52 
+53 
 	`mem˝y
 (
 chûd_tf
@@ -63979,7 +64047,7 @@ chûd_tf
 å≠‰ame
 ));
 
-54 
+55 
 exô_°©us
  = 
 	`thªad_f‹k
@@ -63995,23 +64063,23 @@ chûd_¥oc
 chûd_tf
 , -1);
 
-55 if(
+56 if(
 exô_°©us
 ){
 
-56 
+57 
 	`DEBUG
 (
 DB_SYSCALL
 , "thread_fork() fail in sys_fork()");
 
-58 
+59 
 	`lock_acquúe
 (
 ±abÀ_lock
 );
 
-59 
+60 
 	`ªmove_±_íåy
 (
 chûd_¥oc
@@ -64019,29 +64087,29 @@ chûd_¥oc
 pid
 );
 
-60 
+61 
 	`lock_ªÀa£
 (
 ±abÀ_lock
 );
 
-62 
+63 
 	`¥oc_de°roy
 (
 chûd_¥oc
 );
 
-63 
+64 
 	`k‰ì
 (
 chûd_tf
 );
 
-64  
+65  
 exô_°©us
 ;
 
-67 *
+68 *
 ªtvÆ
  = 
 chûd_¥oc
@@ -64049,23 +64117,23 @@ chûd_¥oc
 pid
 ;
 
-70 
+71 
 	}
 }
 
-78 
+79 
 	$sys__exô
 (
 exôcode
 ) {
 
-80 
+81 
 addr•a˚
  *
 as
 ;
 
-81 
+82 
 ¥oc
  *
 p
@@ -64073,17 +64141,17 @@ p
 cuΩroc
 ;
 
-85 #i‡
+86 #i‡
 OPT_A2
 
 
-86 
+87 
 	`lock_acquúe
 (
 ±abÀ_lock
 );
 
-87 
+88 
 ±_íåy
  *
 ±_cuº
@@ -64095,19 +64163,19 @@ cuΩroc
 pid
 );
 
-88 i‡(
+89 i‡(
 ±_cuº
  =
 NULL
 ){
 
-89 
+90 
 	`DEBUG
 (
 DB_SYSCALL
 , "ptableÉntry missing for currproc in call sys__exit\n");
 
-93 i‡(
+94 i‡(
 ±_cuº
 ->
 ∑ª¡_pid
@@ -64115,7 +64183,7 @@ DB_SYSCALL
 PID_ORPHAN
 )
 
-94 
+95 
 	`ªmove_±_íåy
 (
 cuº¥oc
@@ -64123,7 +64191,7 @@ cuº¥oc
 pid
 );
 
-95 
+96 
 	`upd©e_±_chûdªn
 (
 cuº¥oc
@@ -64131,17 +64199,17 @@ cuº¥oc
 pid
 );
 
-96 
+97 
 	}
 } {
 
-98 i‡(
+99 i‡(
 WIFEXITED
 (
 exôcode
 )){
 
-99 
+100 
 	g±_cuº
 ->
 	gexô_°©us
@@ -64151,13 +64219,13 @@ _MKWAIT_EXIT
 exôcode
 );
 
-100 } i‡(
+101 } i‡(
 WIFSIGNALED
 (
 exôcode
 )) {
 
-101 
+102 
 	g±_cuº
 ->
 	gexô_°©us
@@ -64167,7 +64235,7 @@ _MKWAIT_SIG
 exôcode
 );
 
-103 
+104 
 	g±_cuº
 ->
 	gexô_°©us
@@ -64177,7 +64245,15 @@ _MKWAIT_STOP
 exôcode
 );
 
-105 
+106 
+	g±_cuº
+->
+	g°©us
+ = 
+S_ZOMBIE
+;
+
+107 
 upd©e_±_chûdªn
 (
 cuº¥oc
@@ -64185,7 +64261,7 @@ cuº¥oc
 pid
 );
 
-106 
+108 
 cv_brﬂdˇ°
 (
 ±abÀ_cv
@@ -64193,13 +64269,13 @@ cv_brﬂdˇ°
 ±abÀ_lock
 );
 
-108 
+110 
 lock_ªÀa£
 (
 ±abÀ_lock
 );
 
-112 
+114 
 DEBUG
 (
 DB_SYSCALL
@@ -64207,7 +64283,7 @@ DB_SYSCALL
 exôcode
 );
 
-114 
+116 
 KASSERT
 (
 cuΩroc
@@ -64217,11 +64293,11 @@ p_addr•a˚
 NULL
 );
 
-115 
+117 
 as_dó˘iv©e
 ();
 
-123 
+125 
 	gas
  = 
 cuΩroc_£ès
@@ -64229,33 +64305,33 @@ cuΩroc_£ès
 NULL
 );
 
-124 
+126 
 as_de°roy
 (
 as
 );
 
-128 
+130 
 ¥oc_ªmthªad
 (
 cuπhªad
 );
 
-132 
+134 
 ¥oc_de°roy
 (
 p
 );
 
-134 
+136 
 thªad_exô
 ();
 
-136 
+138 
 ∑nic
 ("return fromÅhread_exit in sys_exit\n");
 
-142 
+144 
 	$sys_gëpid
 (
 pid_t
@@ -64263,7 +64339,7 @@ pid_t
 ªtvÆ
 )
 
-146 *
+148 *
 ªtvÆ
  = 
 cuΩroc
@@ -64271,11 +64347,11 @@ cuΩroc
 pid
 ;
 
-148 
+150 
 	}
 }
 
-153 
+155 
 	$sys_waôpid
 (
 pid_t
@@ -64283,49 +64359,137 @@ pid_t
 pid
 ,
 
-154 
+156 
 u£Ωå_t
  
 °©us
 ,
 
-155 
+157 
 ›ti⁄s
 ,
 
-156 
+158 
 pid_t
  *
 ªtvÆ
 )
 
-158 
+160 
 exô°©us
 ;
 
-159 
+161 
 ªsu…
 ;
 
-170 
+172 
 	`lock_acquúe
 (
 ±abÀ_lock
 );
 
-172 i‡(
+173 
+±_íåy
+ *
+±_chûd
+ = 
+	`gë_±abÀ_íåy
+(
+pid
+);
+
+175 i‡(
 ›ti⁄s
  != 0) {
 
-173 (
-EINVAL
+176 
+	`lock_ªÀa£
+(
+±abÀ_lock
 );
 
-176 
-exô°©us
- = 0;
+177  
+EINVAL
+;
 
-177 
+178 } i‡(
+±_chûd
+ =
+NULL
+) {
+
+179 
+	`lock_ªÀa£
+(
+±abÀ_lock
+);
+
+180  
+ESRCH
+;
+
+181 } i‡(
+±_chûd
+->
+∑ª¡_pid
+ !
+cuº¥oc
+->
+pid
+){
+
+182 
+	`lock_ªÀa£
+(
+±abÀ_lock
+);
+
+183  
+ECHILD
+;
+
+184 } i‡(
+°©us
+ =
+NULL
+){
+
+185 
+	`lock_ªÀa£
+(
+±abÀ_lock
+);
+
+186  
+EFAULT
+;
+
+189 
+±_chûd
+->
+°©us
+ =
+S_RUN
+){
+
+190 
+	`cv_waô
+(
+±abÀ_cv
+, 
+±abÀ_lock
+);
+
+195 
+exô°©us
+ = 
+±_cuº
+->
+exô_°©us
+;
+
+196 
 ªsu…
  = 
 	`c›yout
@@ -64335,21 +64499,21 @@ exô°©us
 °©us
 ,());
 
-178 i‡(
+197 i‡(
 ªsu…
 ) {
 
-179 (
+198 (
 ªsu…
 );
 
-181 *
+200 *
 ªtvÆ
  = 
 pid
 ;
 
-183 
+202 
 	}
 }
 

@@ -12,6 +12,7 @@
 #include <queue.h>
 #include <opt-A2.h>
 #include <mips/trapframe.h>
+#include <synch.h>
 
 
 #if OPT_A2
@@ -90,9 +91,9 @@ void sys__exit(int exitcode) {
       // do stuff
   } 
 
-  if (pt_curr->parent_pid == PID_ORPHAN)
-   remove_pt_entry(currproc->pid);
-   update_pt_children(currproc->pid);
+  if (pt_curr->parent_pid == PID_ORPHAN){
+   remove_pt_entry(curproc->pid);
+   update_pt_children(curproc->pid);
   } else {
    // check if process exited or was signalled/stopped
    if (WIFEXITED(exitcode)){
@@ -103,7 +104,7 @@ void sys__exit(int exitcode) {
     pt_curr->exit_status = _MKWAIT_STOP(exitcode);
    }
    pt_curr->status = S_ZOMBIE;
-   update_pt_children(currproc->pid);
+   update_pt_children(curproc->pid);
    cv_broadcast(ptable_cv, ptable_lock);
   }
   lock_release(ptable_lock);
@@ -177,7 +178,7 @@ sys_waitpid(pid_t pid,
   } else if (pt_child == NULL) {
     lock_release(ptable_lock);
     return ESRCH;
-  } else if (pt_child->parent_pid != currproc->pid){
+  } else if (pt_child->parent_pid != curproc->pid){
     lock_release(ptable_lock);
     return ECHILD;
   } else if (status == NULL){
@@ -191,7 +192,7 @@ sys_waitpid(pid_t pid,
 
 
   /* for now, just pretend the exitstatus is 0 */
-  exitstatus = pt_curr->exit_status;
+  exitstatus = pt_child->exit_status;
   result = copyout((void *)&exitstatus,status,sizeof(int));
   if (result) {
     return(result);

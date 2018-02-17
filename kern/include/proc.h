@@ -49,11 +49,20 @@
 
 extern struct queue *reuse_pids;
 extern pid_t pids_n; // num pids allocated
-extern struct pt_entry; // proc_table entry
-extern array *proc_table; // global table for holding process status info
+extern struct array *proc_table; // global table for holding process status info
+extern struct lock *pid_lock; 
+extern struct lock *ptable_lock;
+extern struct cv *ptable_cv;
+
+struct pt_entry{
+    pid_t pid;
+    pid_t parent_pid;
+    threadstate_t status;
+    int exit_status;
+};
 
 pid_t genPID(void); // generate pid
-pt_entry *create_pt_entry(pid_t parent_pid);
+struct pt_entry *create_pt_entry(pid_t parent_pid);
 void add_pt_entry(pid_t pid);
 void remove_pt_entry(pid_t pid);
 struct pt_entry *get_ptable_entry(pid_t pid);
@@ -89,7 +98,7 @@ struct proc {
      system calls, since each process will need to keep track of all files
      it has opened, not just the console. */
   struct vnode *console;                /* a vnode for the console device */
-
+#endif /* UW */
 #if OPT_A2
     pid_t pid; // process ID
     struct cv *wait_cv;
