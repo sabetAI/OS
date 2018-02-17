@@ -50,6 +50,7 @@
 #include <vfs.h>
 #include <synch.h>
 #include <kern/fcntl.h>  
+#include <thread.h>
 
 /*
  * The process for the kernel; this holds all the kernel-only threads.
@@ -74,6 +75,9 @@ struct semaphore *no_proc_sem;
 struct queue *reuse_pids;
 pid_t pids_n = 0;
 struct lock *pid_lock; 
+struct lock *ptable_lock;
+struct cv *ptable_cv;
+struct array *proc_table;
 
 pid_t genPID(void){
    lock_acquire(pid_lock);
@@ -88,6 +92,73 @@ pid_t genPID(void){
    }
 }
 
+struct pt_entry{
+    pid_t pid;
+    pid_t parent_pid;
+    threadstate_t status;
+    int exit_status;
+};
+
+
+struct pt_entry *create_pt_entry(pid_t parent_pid){
+    struct pt_entry *entry = kmalloc(sizeof(struct pt_entry));
+    if (entry == NULL){
+        panic("create_pt_entry failed to allocate memory!\n");
+    }
+    entry->pid = genPID();
+    entry->parent_pid = parent_pid;
+    entry->status = S_RUN;
+    // should set exit status?
+}
+
+void add_pt_entry(pid_t pid){
+    struct pt_entry *entry = create_pt_entry(pid_t pid);
+    array_add(proc_table, entry, NULL);
+}
+
+void remove_pt_entry(pid_t pid){
+    for (int i = 0; i < array_num(proc_table); i++){
+        struct pt_entry *entry = array_get(proc_table, i);
+        if (entry->pid == pid){
+            kfree(pt_entry);
+            array_remove(proc_table, i);
+        }
+        
+    }
+}
+
+
+struct pt_entry *get_ptable_entry(pid_t pid){
+    for (int i = 0; i < array_num(proc_table); i++){
+        struct pt_entry *entry = array_get(proc_table, i);
+        if (entry->pid == pid){
+           return entry; 
+        }
+    }
+    // process exited
+    return NULL;
+}
+
+void update_pt_children(pid_t pid){
+    for (int i = 0; i < array_num(proc_table); i++){
+        struct pt_entry *entry = array_get(proc_table, i);
+        if (entry->parent_pid == pid 
+                && entry->status == S_ZOMBIE){
+            pid_t *child_pid = kmalloc(sizeof(pid_t));
+            *child_pid = entry->pid;
+
+            lock_acquire(ptable_lock);
+            remove_pt_entry(child_pid);
+            lock_release(ptable_lock);
+
+            lock_acquire(pid_lock);
+            q_addtail(reuse_pids, child_pid);
+            lock_release(pid_lock);
+        } else if (entry->parent_pid == pid) {
+            entry->parent_pid = PID_ORPHAN;
+        }
+    }
+}
 
 
 #endif /* OPT_A2  */
@@ -231,8 +302,20 @@ proc_bootstrap(void)
   }
 #endif // UW 
 #if OPT_A2
-    reuse_pids = q_create(0); 
-    pid_lock = lock_create("pid lock");
+  reuse_pids = q_create(0); 
+
+  pid_lock = lock_create("pid lock");
+  if (pid_lock == NULL) panic("coud not ceate pid_lock\n");
+
+  ptable_lock = lock_create("process table lock");
+  if (ptable_lock == NULL) panic("could not create ptable_lock\n");
+
+  ptable_cv = cv_create("process table condition variable");
+  if (ptable_cv == NULL) panic("could not create ptable_cv\n");
+
+
+  proc_table = array_create();
+  array_init(proc_table);
 
 #endif /* OPT_A2 */
 }
@@ -299,8 +382,12 @@ proc_create_runprogram(const char *name)
 #endif // UW
     
 #if OPT_A2
+    proc->pid = genPID();
 
-    proc->pid = genPID();    
+    lock_acquire(ptable_lock);
+    add_pt_entry(proc->pid);
+    lock_acquire(ptable_lock);
+
 #endif /* OPT_A2 */
 
 	return proc;

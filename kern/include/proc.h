@@ -41,14 +41,23 @@
 #include <queue.h>
 #include <opt-A2.h>
 #include <kern/types.h>
+#include <array.h>
 
 
 #if OPT_A2
+#define PID_ORPHAN -1
 
 extern struct queue *reuse_pids;
-extern pid_t pids_n;
+extern pid_t pids_n; // num pids allocated
+extern struct pt_entry; // proc_table entry
+extern array *proc_table; // global table for holding process status info
 
-pid_t genPID(void);
+pid_t genPID(void); // generate pid
+pt_entry *create_pt_entry(pid_t parent_pid);
+void add_pt_entry(pid_t pid);
+void remove_pt_entry(pid_t pid);
+struct pt_entry *get_ptable_entry(pid_t pid);
+void update_pt_children(pid_t pid);
 
 #endif /* OPT_A2 */
 
@@ -80,11 +89,11 @@ struct proc {
      system calls, since each process will need to keep track of all files
      it has opened, not just the console. */
   struct vnode *console;                /* a vnode for the console device */
-#endif
 
 #if OPT_A2
-    pid_t pid;
-
+    pid_t pid; // process ID
+    struct cv *wait_cv;
+    
 #endif /* OPT_A2 */ 
 };
 

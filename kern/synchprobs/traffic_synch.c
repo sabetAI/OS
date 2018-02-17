@@ -218,5 +218,4 @@ intersection_after_exit(Direction origin, Direction destination)
 
   cv_broadcast(x_occupied, x_lock);
   lock_release(x_lock);
-
 }
