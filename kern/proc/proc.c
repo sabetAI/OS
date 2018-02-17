@@ -378,7 +378,7 @@ proc_create_runprogram(const char *name)
 
     lock_acquire(ptable_lock);
     add_pt_entry(proc->pid);
-    lock_acquire(ptable_lock);
+    lock_release(ptable_lock);
 
 #endif /* OPT_A2 */
 
