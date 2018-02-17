@@ -71,7 +71,6 @@ struct semaphore *no_proc_sem;
 
 
 #if OPT_A2
-struct queue *reuse_pids;
 pid_t pids_n = 0;
 struct lock *pid_lock; 
 struct lock *ptable_lock;
@@ -80,32 +79,26 @@ struct array *proc_table;
 
 pid_t genPID(void){
    lock_acquire(pid_lock);
-   if(!q_empty(reuse_pids)){
-        pid_t pid = *(pid_t *)q_remhead(reuse_pids);
-        lock_release(pid_lock);
-        return pid;
-   } else {
-        pid_t pid = ++pids_n;
-        lock_release(pid_lock);
-        return pid;
-   }
+   pid_t pid = ++pids_n;
+   lock_release(pid_lock);
+    return pid;
 }
 
 
-struct pt_entry *create_pt_entry(pid_t parent_pid){
+struct pt_entry *pt_create_entry(pid_t pid){
     struct pt_entry *entry = kmalloc(sizeof(struct pt_entry));
     if (entry == NULL){
         panic("create_pt_entry failed to allocate memory!\n");
     }
-    entry->pid = genPID();
-    entry->parent_pid = parent_pid;
+    entry->pid = pid;
+    entry->parent_pid = PID_ORPHAN;
     entry->status = S_RUN;
     return entry;
     // should set exit status?
 }
 
 void add_pt_entry(pid_t pid){
-    struct pt_entry *entry = create_pt_entry(pid);
+    struct pt_entry *entry = pt_create_entry(pid);
     array_add(proc_table, entry, NULL);
 }
 
@@ -138,14 +131,7 @@ void update_pt_children(pid_t pid){
                 && entry->status == S_ZOMBIE){
             pid_t *child_pid = kmalloc(sizeof(pid_t));
             *child_pid = entry->pid;
-
-            lock_acquire(ptable_lock);
             remove_pt_entry(*child_pid);
-            lock_release(ptable_lock);
-
-            lock_acquire(pid_lock);
-            q_addtail(reuse_pids, child_pid);
-            lock_release(pid_lock);
         } else if (entry->parent_pid == pid) {
             entry->parent_pid = PID_ORPHAN;
         }
@@ -294,8 +280,6 @@ proc_bootstrap(void)
   }
 #endif // UW 
 #if OPT_A2
-  reuse_pids = q_create(0); 
-
   pid_lock = lock_create("pid lock");
   if (pid_lock == NULL) panic("coud not ceate pid_lock\n");
 
@@ -474,4 +458,5 @@ curproc_setas(struct addrspace *newas)
 	proc->p_addrspace = newas;
 	spinlock_release(&proc->p_lock);
 	return oldas;
+struct pt_entry *create_pt_entry(pid_t parent_pid);
 }

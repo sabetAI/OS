@@ -47,7 +47,6 @@
 #if OPT_A2
 #define PID_ORPHAN -1
 
-extern struct queue *reuse_pids;
 extern pid_t pids_n; // num pids allocated
 extern struct array *proc_table; // global table for holding process status info
 extern struct lock *pid_lock; 
@@ -62,7 +61,7 @@ struct pt_entry{
 };
 
 pid_t genPID(void); // generate pid
-struct pt_entry *create_pt_entry(pid_t parent_pid);
+struct pt_entry *pt_create_entry(pid_t pid);
 void add_pt_entry(pid_t pid);
 void remove_pt_entry(pid_t pid);
 struct pt_entry *get_ptable_entry(pid_t pid);

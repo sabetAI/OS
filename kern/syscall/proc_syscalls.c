@@ -65,6 +65,11 @@ pid_t sys_fork(struct trapframe *parent_tf, pid_t *retval){
         return exit_status; 
     }
 
+    lock_acquire(ptable_lock);
+    struct pt_entry *pt_child = get_ptable_entry(child_proc->pid);
+    pt_child->parent_pid = curproc->pid;
+    lock_release(ptable_lock);
+
     *retval = child_proc->pid;
 
     return 0;
@@ -190,6 +195,7 @@ sys_waitpid(pid_t pid,
       cv_wait(ptable_cv, ptable_lock);
   }
 
+  lock_release(ptable_lock);
 
   /* for now, just pretend the exitstatus is 0 */
   exitstatus = pt_child->exit_status;
