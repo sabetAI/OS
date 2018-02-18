@@ -92,9 +92,11 @@ void sys__exit(int exitcode) {
   lock_acquire(ptable_lock);
   struct pt_entry *pt_curr = get_ptable_entry(curproc->pid);
   if (pt_curr == NULL){
-      DEBUG(DB_SYSCALL, "ptable entry missing for currproc in call sys__exit\n");
+      DEBUG(DB_THREADS, "ptable entry missing for currproc in call sys__exit\n");
       // do stuff
   } 
+
+  //kprintf("pid: %d is exiting", pt_curr->pid);
 
   if (pt_curr->parent_pid == PID_ORPHAN){
    remove_pt_entry(curproc->pid);
@@ -112,11 +114,12 @@ void sys__exit(int exitcode) {
    update_pt_children(curproc->pid);
    cv_broadcast(ptable_cv, ptable_lock);
   }
+
   lock_release(ptable_lock);
 
 #endif /* OPT_A2 */
 
-  DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
+  DEBUG(DB_THREADS,"Syscall: _exit(%d)\n",exitcode);
 
   KASSERT(curproc->p_addrspace != NULL);
   as_deactivate();
@@ -195,10 +198,12 @@ sys_waitpid(pid_t pid,
       cv_wait(ptable_cv, ptable_lock);
   }
 
-  lock_release(ptable_lock);
 
   /* for now, just pretend the exitstatus is 0 */
   exitstatus = pt_child->exit_status;
+  remove_pt_entry(pt_child->pid);
+  lock_release(ptable_lock);
+
   result = copyout((void *)&exitstatus,status,sizeof(int));
   if (result) {
     return(result);

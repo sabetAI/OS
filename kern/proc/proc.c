@@ -93,6 +93,7 @@ struct pt_entry *pt_create_entry(pid_t pid){
     entry->pid = pid;
     entry->parent_pid = PID_ORPHAN;
     entry->status = S_RUN;
+    entry->exit_status = -1;
     return entry;
     // should set exit status?
 }
