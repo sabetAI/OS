@@ -112,7 +112,7 @@ void sys__exit(int exitcode) {
    }
    pt_curr->status = S_ZOMBIE;
    update_pt_children(curproc->pid);
-   cv_broadcast(ptable_cv, ptable_lock);
+   cv_broadcast(ptable_cv, ptable_lock); // maybe should wakeone instead of broadcast
   }
 
   lock_release(ptable_lock);
@@ -212,3 +212,136 @@ sys_waitpid(pid_t pid,
   return(0);
 }
 
+#if OPT_A2
+int sys_execv(const char *program, char **args){
+    int argc = 0;    
+    bool kmalloc_fail = false;
+    bool cpy_fail = false;
+    struct addrspace *curr_as = curproc_getas();
+	vaddr_t entrypoint, stackptr;
+    vaddr_t argsptr[argc+1];
+    struct vnode v;
+    int result;
+
+    if (program == NULL){
+        return ENOENT;
+    }
+
+    for (; args[argc] != NULL; ++argc){
+        if (strlen(args[argc]) > 512){
+            return E2BIG;
+        }
+    }
+    
+    if (argc > MAXMENUARGS){
+        return E2BIG;
+    }
+    
+    char *kprogram = kmalloc(sizeof(char) * (strlen(program) + 1));
+    if (kprogram == NULL){
+        return ENOMEM;
+    }
+
+    char **kargs = kmalloc(sizeof(char *) * (argc + 1));
+    if (kargs == NULL){
+        kfree(kprogram);
+        return ENOMEM;
+    }
+
+    result = copyinstr((userptr_t) program, kprogram, strlen(program)+1, NULL);
+    if (result){
+        kfree(kprogram);
+        kfree(kars);
+        return ENOEXEC;
+    }
+
+    for (int i = 0; i < argc; ++i){
+        kargs[i] = kmalloc(sizeof(char) * (strlen(args[i]) + 1));
+        if (kargs[i] == NULL) kmalloc_fail = true;
+    }
+    
+    if (kmalloc_fail){
+        for (int i = 0; i < argc; ++i) kfree(kargs[i]); 
+        kfree(kargs);
+        kfree(kprogram);
+        return ENOMEM;
+    }
+
+    for (int i = 0; i < argc; ++i){
+        int cpy_result = copyinstr((userptr_t) args[i], kargs[i], strlen(args[i]+1), NULL);
+        if (cpy_result) cpy_fail = true;
+    }
+
+    if (cpy_fail){
+        for (int i = 0; i < argc; ++i) kfree(kargs[i]);
+        kfree(kargs);
+        kfree(kprogram);
+        return EFAULT;
+    }
+
+    kargs[argc] = NULL;
+    result = vfs_open(program, O_RDONLY, 0, &v);
+    if (vfs_result) return result;
+
+	KASSERT(curproc_getas() == NULL);
+
+    as = as_create();
+    if (as == NULL){
+        vfs_close(v);
+        return ENOMEM;
+    }
+
+    curproc_setas(as);
+    as_activate();
+
+    result = load_elf(v, &entrypoint);
+    if (result){
+        vfs_close(v);
+        curproc_setas(curr_as);
+        return result;
+    }
+
+    vfs_close(v);
+
+    result = as_define_stack(as, &stackptr);
+    if (result){
+        curproc_setas(curr_as);
+        return result;
+    }
+
+    while((stackptr % 8) != 0) stackptr -= 1;
+
+    for (int i = argc-1; i >= 0; --i){
+        stackptr -= strlen(kargs[i]) + 1;
+        result = copyoutstr(new_prog_args[i], (userptr_t) stackptr, 
+                            strlen(kargs[i])+1, NULL);
+        if (result){
+            for (j = 0; j < argc; ++j) kfree(kargs[j]);
+            kfree(kargs);
+            kfree(kprogram);
+            return result;
+        }
+        argsptr[i] = stackptr;
+    }
+
+    while((stackptr % 4) != 0) stackptr -= 1;
+    
+    argsptr[argc] = 0;
+    for (int i = argc; i >= 0; --i){
+        stackptr -= ROUNDUP(sizeof(vaddr_t), 4);
+        result = copyout(&argsptr[i], (userptr_t) stackptr, sizeof(vaddr_t));
+        if (result){
+            for (int j = 0; j <= argc; ++j) kfree(args[j]);
+            kfree(args);
+            kfree(kprogram);
+            return result;
+        }
+    }
+
+    as_destroy(curr_as);
+
+    enter_new_process(argc, (userptr_t) stackptr, stackptr, entrypoint);
+    panic("sys_execv: enter_new_process returned\n");
+    return EINVAL;
+}
+#endif // OPT_A2

@@ -132,10 +132,12 @@ syscall(struct trapframe *tf)
 #if OPT_A2
     case SYS_fork:
       err = sys_fork(tf, (pid_t *)&retval);
+      break;
+    case SYS_execv:
+      err = sys_execv((char *)tf->tf_a0, (char **)tf->tf_a1);
+      break;
 #endif /* OPT_A2 */
-	  break;
 #endif // UW
-
 	    /* Add stuff here */
  
 	default:
