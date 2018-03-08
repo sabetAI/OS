@@ -13,7 +13,9 @@
 #include <opt-A2.h>
 #include <mips/trapframe.h>
 #include <synch.h>
-
+#include <vnode.h>
+#include <vfs.h>
+#include <kern/fcntl.h>
 
 #if OPT_A2
 pid_t sys_fork(struct trapframe *parent_tf, pid_t *retval){
@@ -218,9 +220,9 @@ int sys_execv(const char *program, char **args){
     bool kmalloc_fail = false;
     bool cpy_fail = false;
     struct addrspace *curr_as = curproc_getas();
+    struct addrspace *as;
 	vaddr_t entrypoint, stackptr;
-    vaddr_t argsptr[argc+1];
-    struct vnode v;
+    struct vnode *v;
     int result;
 
     if (program == NULL){
@@ -232,8 +234,8 @@ int sys_execv(const char *program, char **args){
             return E2BIG;
         }
     }
-    
-    if (argc > MAXMENUARGS){
+   
+    if (argc > 16){
         return E2BIG;
     }
     
@@ -251,7 +253,7 @@ int sys_execv(const char *program, char **args){
     result = copyinstr((userptr_t) program, kprogram, strlen(program)+1, NULL);
     if (result){
         kfree(kprogram);
-        kfree(kars);
+        kfree(kargs);
         return ENOEXEC;
     }
 
@@ -280,8 +282,8 @@ int sys_execv(const char *program, char **args){
     }
 
     kargs[argc] = NULL;
-    result = vfs_open(program, O_RDONLY, 0, &v);
-    if (vfs_result) return result;
+    result = vfs_open(kprogram, O_RDONLY, 0, &v);
+    if (result) return result;
 
 	KASSERT(curproc_getas() == NULL);
 
@@ -297,7 +299,6 @@ int sys_execv(const char *program, char **args){
     result = load_elf(v, &entrypoint);
     if (result){
         vfs_close(v);
-        curproc_setas(curr_as);
         return result;
     }
 
@@ -305,18 +306,20 @@ int sys_execv(const char *program, char **args){
 
     result = as_define_stack(as, &stackptr);
     if (result){
-        curproc_setas(curr_as);
         return result;
     }
 
-    while((stackptr % 8) != 0) stackptr -= 1;
+    // stackptr must be 8-byte aligned
+    for (; (stackptr % 8) != 0; --stackptr);
+    
+    vaddr_t argsptr[argc+1];
 
     for (int i = argc-1; i >= 0; --i){
         stackptr -= strlen(kargs[i]) + 1;
-        result = copyoutstr(new_prog_args[i], (userptr_t) stackptr, 
+        result = copyoutstr(kargs[i], (userptr_t) stackptr, 
                             strlen(kargs[i])+1, NULL);
         if (result){
-            for (j = 0; j < argc; ++j) kfree(kargs[j]);
+            for (int j = 0; j < argc; ++j) kfree(kargs[j]);
             kfree(kargs);
             kfree(kprogram);
             return result;
@@ -324,15 +327,15 @@ int sys_execv(const char *program, char **args){
         argsptr[i] = stackptr;
     }
 
-    while((stackptr % 4) != 0) stackptr -= 1;
+    for (; (stackptr % 4) != 0; --stackptr)
     
     argsptr[argc] = 0;
     for (int i = argc; i >= 0; --i){
         stackptr -= ROUNDUP(sizeof(vaddr_t), 4);
         result = copyout(&argsptr[i], (userptr_t) stackptr, sizeof(vaddr_t));
         if (result){
-            for (int j = 0; j <= argc; ++j) kfree(args[j]);
-            kfree(args);
+            for (int j = 0; j <= argc; ++j) kfree(kargs[j]);
+            kfree(kargs);
             kfree(kprogram);
             return result;
         }
