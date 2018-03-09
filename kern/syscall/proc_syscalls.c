@@ -216,13 +216,13 @@ sys_waitpid(pid_t pid,
 
 #if OPT_A2
 int sys_execv(const char *program, char **args){
-    int argc = 0;    
-    bool kmalloc_fail = false;
-    bool cpy_fail = false;
     struct addrspace *curr_as = curproc_getas();
     struct addrspace *as;
 	vaddr_t entrypoint, stackptr;
     struct vnode *v;
+    int argc = 0;    
+    bool kmalloc_fail = false;
+    bool cpy_fail = false;
     int result;
 
     if (program == NULL){
@@ -297,6 +297,7 @@ int sys_execv(const char *program, char **args){
     result = load_elf(v, &entrypoint);
     if (result){
         vfs_close(v);
+        curproc_setas(curr_as);
         return result;
     }
 
@@ -304,6 +305,7 @@ int sys_execv(const char *program, char **args){
 
     result = as_define_stack(as, &stackptr);
     if (result){
+        curproc_setas(curr_as);
         return result;
     }
 
@@ -313,15 +315,16 @@ int sys_execv(const char *program, char **args){
 
     for (int i = argc-1; i >= 0; --i){
         stackptr -= strlen(kargs[i]) + 1;
+        argsptr[i] = stackptr;
         result = copyoutstr(kargs[i], (userptr_t) stackptr, 
                             strlen(kargs[i])+1, NULL);
         if (result){
             for (int j = 0; j < argc; ++j) kfree(kargs[j]);
             kfree(kargs);
             kfree(kprogram);
+            curproc_setas(curr_as);
             return result;
         }
-        argsptr[i] = stackptr;
     }
 
     for (; (stackptr % 4) != 0; --stackptr);
@@ -334,6 +337,7 @@ int sys_execv(const char *program, char **args){
             for (int j = 0; j <= argc; ++j) kfree(kargs[j]);
             kfree(kargs);
             kfree(kprogram);
+            curproc_setas(curr_as);
             return result;
         }
     }
