@@ -109,9 +109,9 @@ runprogram(char *progname, char **args)
     }
 
     vaddr_t argsptr[argc + 1];
-    if (argc > 16) return E2BIG;
+    if (argc > 16) { return E2BIG; }
 
-    for (;(stackptr % 8) != 0; --stackptr) 
+    for (;(stackptr % 8) != 0; --stackptr);
 
     for (int i = argc-1; i >= 0; --i){
         stackptr -= strlen(args[i]) + 1;
@@ -121,7 +121,7 @@ runprogram(char *progname, char **args)
         argsptr[i] = stackptr;
     }
 
-    for (; (stackptr % 4) != 0; --stackptr)
+    for (; (stackptr % 4) != 0; --stackptr);
 
     argsptr[argc] = 0;
     for (int i = argc; i >= 0; --i){

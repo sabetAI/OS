@@ -270,7 +270,7 @@ int sys_execv(const char *program, char **args){
     }
 
     for (int i = 0; i < argc; ++i){
-        int cpy_result = copyinstr((userptr_t) args[i], kargs[i], strlen(args[i]+1), NULL);
+        int cpy_result = copyinstr((userptr_t) args[i], kargs[i], strlen(args[i])+1, NULL);
         if (cpy_result) cpy_fail = true;
     }
 
@@ -283,9 +283,7 @@ int sys_execv(const char *program, char **args){
 
     kargs[argc] = NULL;
     result = vfs_open(kprogram, O_RDONLY, 0, &v);
-    if (result) return result;
-
-	KASSERT(curproc_getas() == NULL);
+    if (result) { return result; }
 
     as = as_create();
     if (as == NULL){
@@ -311,7 +309,6 @@ int sys_execv(const char *program, char **args){
 
     // stackptr must be 8-byte aligned
     for (; (stackptr % 8) != 0; --stackptr);
-    
     vaddr_t argsptr[argc+1];
 
     for (int i = argc-1; i >= 0; --i){
@@ -327,7 +324,7 @@ int sys_execv(const char *program, char **args){
         argsptr[i] = stackptr;
     }
 
-    for (; (stackptr % 4) != 0; --stackptr)
+    for (; (stackptr % 4) != 0; --stackptr);
     
     argsptr[argc] = 0;
     for (int i = argc; i >= 0; --i){
