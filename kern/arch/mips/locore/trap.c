@@ -39,6 +39,7 @@
 #include <vm.h>
 #include <mainbus.h>
 #include <syscall.h>
+#include "opt-A3"
 
 
 /* in exception.S */
@@ -108,13 +109,19 @@ kill_curthread(vaddr_t epc, unsigned code, vaddr_t vaddr)
 		break;
 	}
 
-	/*
-	 * You will probably want to change this.
-	 */
+    #if OPT_A3
+       (void)epc;
+       (void)vaddr;
+       struct proc *proc = curproc;
+       as_deactivate();
+       as = curproc_setas(NULL);
+       as_destroy(as);
+       proc_remthread(curthread);
+       proc_destroy(proc);
+       thread_exit();
+       // need more here?
+    #endif /* OPT_A3 */
 
-	kprintf("Fatal user mode trap %u sig %d (%s, epc 0x%x, vaddr 0x%x)\n",
-		code, sig, trapcodenames[code], epc, vaddr);
-	panic("I don't know how to handle this\n");
 }
 
 /*

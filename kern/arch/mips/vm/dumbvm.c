@@ -37,6 +37,7 @@
 #include <mips/tlb.h>
 #include <addrspace.h>
 #include <vm.h>
+#include "opt-A3.h"
 
 /*
  * Dumb MIPS-only "VM system" that is intended to only be just barely
@@ -121,7 +122,9 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	switch (faulttype) {
 	    case VM_FAULT_READONLY:
 		/* We always create pages read-write, so we can't get this */
-		panic("dumbvm: got VM_FAULT_READONLY\n");
+        #if OPT_A3
+            return EINVAL;
+        #endif /* OPT_A3 */
 	    case VM_FAULT_READ:
 	    case VM_FAULT_WRITE:
 		break;
@@ -194,15 +197,27 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		}
 		ehi = faultaddress;
 		elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
-		DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);
+		#if OPT_A3
+            if (as->as_isloaded && faultaddress >= vbase1 && faultaddress < vtop1){
+                elo &= ~TLBLO_DIRTY;
+            }
+        #endif /* OPT_A3 */  
+        DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);
 		tlb_write(ehi, elo, i);
 		splx(spl);
 		return 0;
 	}
 
-	kprintf("dumbvm: Ran out of TLB entries - cannot handle page fault\n");
-	splx(spl);
-	return EFAULT;
+    #if OPT_A3
+        ehi = faultaddress;
+        eho = paddr | TLBLO_VALID | TLBLO_DIRTY;
+        if (as->isloaded && faultaddress >= vbase1 && faultaddress < vtop1){
+            elo &= ~TLBLO_DIRTY;
+        }
+        tlb_random(ehi, elo);
+        splx(spl);
+        return 0;
+    #endif /* OPT_A3 */  
 }
 
 struct addrspace *
@@ -220,6 +235,9 @@ as_create(void)
 	as->as_pbase2 = 0;
 	as->as_npages2 = 0;
 	as->as_stackpbase = 0;
+    #if OPT_A3
+        as->as_isloaded = false;
+    #endif /* OPT_A3 */
 
 	return as;
 }
@@ -275,10 +293,11 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t sz,
 
 	npages = sz / PAGE_SIZE;
 
-	/* We don't use these - all pages are read-write */
-	(void)readable;
-	(void)writeable;
-	(void)executable;
+    #if OPT_A3
+        as->as_isreadable = readable;
+        as->as_iswritable = writable;
+        as->as_isexecutable = executable;
+    #endif /* OPT_A3 */
 
 	if (as->as_vbase1 == 0) {
 		as->as_vbase1 = vaddr;
@@ -338,7 +357,9 @@ as_prepare_load(struct addrspace *as)
 int
 as_complete_load(struct addrspace *as)
 {
-	(void)as;
+    #if OPT_A3
+        as->as_isloaded = true;
+    #endif /* OPT_A3 */
 	return 0;
 }
 
