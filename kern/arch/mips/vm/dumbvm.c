@@ -37,6 +37,7 @@
 #include <mips/tlb.h>
 #include <addrspace.h>
 #include <vm.h>
+#include <syscall.h>
 #include "opt-A3.h"
 
 /*
@@ -51,6 +52,9 @@
  * Wrap rma_stealmem in a spinlock.
  */
 static struct spinlock stealmem_lock = SPINLOCK_INITIALIZER;
+int page_tot;
+paddr_t first, last;
+
 
 void
 vm_bootstrap(void)
@@ -121,9 +125,9 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
 	switch (faulttype) {
 	    case VM_FAULT_READONLY:
-		/* We always create pages read-write, so we can't get this */
         #if OPT_A3
-            return EINVAL;
+            return EFAULT;
+            //return EINVAL;
         #endif /* OPT_A3 */
 	    case VM_FAULT_READ:
 	    case VM_FAULT_WRITE:
@@ -172,7 +176,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	stacktop = USERSTACK;
 
 	if (faultaddress >= vbase1 && faultaddress < vtop1) {
-		paddr = (faultaddress - vbase1) + as->as_pbase1;
+        paddr = (faultaddress - vbase1) + as->as_pbase1;
 	}
 	else if (faultaddress >= vbase2 && faultaddress < vtop2) {
 		paddr = (faultaddress - vbase2) + as->as_pbase2;
@@ -197,7 +201,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		}
 		ehi = faultaddress;
 		elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
-		#if OPT_A3
+        #if OPT_A3
             if (as->as_isloaded && faultaddress >= vbase1 && faultaddress < vtop1){
                 elo &= ~TLBLO_DIRTY;
             }
@@ -210,8 +214,8 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
     #if OPT_A3
         ehi = faultaddress;
-        eho = paddr | TLBLO_VALID | TLBLO_DIRTY;
-        if (as->isloaded && faultaddress >= vbase1 && faultaddress < vtop1){
+        elo = paddr | TLBLO_VALID | TLBLO_DIRTY;
+        if (as->as_isloaded && faultaddress >= vbase1 && faultaddress < vtop1){
             elo &= ~TLBLO_DIRTY;
         }
         tlb_random(ehi, elo);
@@ -235,9 +239,9 @@ as_create(void)
 	as->as_pbase2 = 0;
 	as->as_npages2 = 0;
 	as->as_stackpbase = 0;
-    #if OPT_A3
-        as->as_isloaded = false;
-    #endif /* OPT_A3 */
+#if OPT_A3
+    as->as_isloaded = false;
+#endif /* OPT_A3 */
 
 	return as;
 }
@@ -245,6 +249,12 @@ as_create(void)
 void
 as_destroy(struct addrspace *as)
 {
+    #if OPT_A3
+	    free_kpages(PADDR_TO_KVADDR(as->as_pbase1));
+	    free_kpages(PADDR_TO_KVADDR(as->as_pbase2));
+    	free_kpages(PADDR_TO_KVADDR(as->as_stackpbase));
+	#endif
+
 	kfree(as);
 }
 
@@ -295,7 +305,7 @@ as_define_region(struct addrspace *as, vaddr_t vaddr, size_t sz,
 
     #if OPT_A3
         as->as_isreadable = readable;
-        as->as_iswritable = writable;
+        as->as_iswriteable = writeable;
         as->as_isexecutable = executable;
     #endif /* OPT_A3 */
 
@@ -357,9 +367,10 @@ as_prepare_load(struct addrspace *as)
 int
 as_complete_load(struct addrspace *as)
 {
-    #if OPT_A3
-        as->as_isloaded = true;
-    #endif /* OPT_A3 */
+#if OPT_A3
+    as->as_isloaded = true;
+    as_activate(); // do I put this here?
+#endif /* OPT_A3 */
 	return 0;
 }
 
