@@ -68,18 +68,18 @@ vm_bootstrap(void)
     num_frames = (memhi - memlo)/PAGE_SIZE;
     int coremap_size = num_frames*sizeof(cmap_entry); 
     int coremap_npage = (coremap_size + PAGE_SIZE - 1)/PAGE_SIZE;
-    paddr_t coremap_addr = ram_stealmem(coremap_npage);
     
-    memlo += coremap_npage*PAGE_SIZE;
-    memlo = ROUNDUP(memlo, PAGE_SIZE);
-    num_frames = (memhi - memlo)/PAGE_SIZE;
-
     spinlock_acquire(&coremap_lock);
-    coremap = (cmap_entry *)PADDR_TO_KVADDR(coremap_addr);
+    coremap = (cmap_entry *)PADDR_TO_KVADDR(memlo);
     for (int i = 0; i < num_frames; ++i){
         coremap[i] = 0;
     }
     spinlock_release(&coremap_lock);
+
+    memlo += coremap_npage*PAGE_SIZE;
+    memlo = ROUNDUP(memlo, PAGE_SIZE);
+    num_frames = (memhi - memlo)/PAGE_SIZE;
+
 
 #endif /* OPT_A3 */
 }
@@ -150,9 +150,10 @@ void
 free_kpages(vaddr_t addr)
 {
 #if OPT_A3
+    paddr_t paddr = KVADDR_TO_PADDR(addr);
     spinlock_acquire(&coremap_lock);
-    if (!coremap){
-        int first = (addr - memlo)/PAGE_SIZE;
+    if (coremap){
+        int first = (paddr - memlo)/PAGE_SIZE;
         KASSERT(coremap[first] != 0);
         
         coremap[first] = 0;
@@ -322,9 +323,9 @@ void
 as_destroy(struct addrspace *as)
 {
     #if OPT_A3
-	    free_kpages(as->as_pbase1);
-	    free_kpages(as->as_pbase2);
-    	free_kpages(as->as_stackpbase);
+	    free_kpages(PADDR_TO_KVADDR(as->as_pbase1));
+	    free_kpages(PADDR_TO_KVADDR(as->as_pbase2));
+    	free_kpages(PADDR_TO_KVADDR(as->as_stackpbase));
 	#endif
 
 	kfree(as);

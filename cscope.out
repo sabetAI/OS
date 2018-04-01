@@ -1,4 +1,4 @@
-cscope 15 $HOME/cs350-os161/os161-1.99               0000979363
+cscope 15 $HOME/cs350-os161/os161-1.99               0000979301
 	@build/install/hostinclude/hostcompat.h
 
 31 
@@ -14149,17 +14149,41 @@ c‹em≠_size
 PAGE_SIZE
  - 1)/PAGE_SIZE;
 
-71 
-∑ddr_t
- 
-c‹em≠_addr
- = 
-	`øm_°ólmem
-(
-c‹em≠_≈age
+72 
+	`•ölock_acquúe
+(&
+c‹em≠_lock
 );
 
 73 
+c‹em≠
+ = (
+cm≠_íåy
+ *)
+	`PADDR_TO_KVADDR
+(
+memlo
+);
+
+74 
+i
+ = 0; i < 
+num_‰ames
+; ++i){
+
+75 
+c‹em≠
+[
+i
+] = 0;
+
+77 
+	`•ölock_ªÀa£
+(&
+c‹em≠_lock
+);
+
+79 
 memlo
  +
 c‹em≠_≈age
@@ -14167,7 +14191,7 @@ c‹em≠_≈age
 PAGE_SIZE
 ;
 
-74 
+80 
 memlo
  = 
 	`ROUNDUP
@@ -14175,7 +14199,7 @@ memlo
 PAGE_SIZE
 );
 
-75 
+81 
 num_‰ames
  = (
 memhi
@@ -14184,40 +14208,6 @@ memlo
 )/
 PAGE_SIZE
 ;
-
-77 
-	`•ölock_acquúe
-(&
-c‹em≠_lock
-);
-
-78 
-c‹em≠
- = (
-cm≠_íåy
- *)
-	`PADDR_TO_KVADDR
-(
-c‹em≠_addr
-);
-
-79 
-i
- = 0; i < 
-num_‰ames
-; ++i){
-
-80 
-c‹em≠
-[
-i
-] = 0;
-
-82 
-	`•ölock_ªÀa£
-(&
-c‹em≠_lock
-);
 
 85 
 	}
@@ -24651,7 +24641,7 @@ _OPT_SYNCHPROBS_H_
 
 2 c⁄° 
 	gbuûdvîsi⁄
- = 14;
+ = 15;
 
 3 c⁄° 
 	gbuûdc⁄fig
