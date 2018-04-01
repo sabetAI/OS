@@ -52,14 +52,36 @@
  * Wrap rma_stealmem in a spinlock.
  */
 static struct spinlock stealmem_lock = SPINLOCK_INITIALIZER;
-int page_tot;
-paddr_t first, last;
+static struct spinlock coremap_lock = SPINLOCK_INITIALIZER;
 
+typedef paddr_t cmap_entry;
+cmap_entry *coremap = NULL;
+paddr_t memlo, memhi;
+int num_frames;
 
 void
 vm_bootstrap(void)
 {
 	/* Do nothing. */
+#if OPT_A3
+    ram_getsize(&memlo, &memhi);
+    num_frames = (memhi - memlo)/PAGE_SIZE;
+    int coremap_size = num_frames*sizeof(cmap_entry); 
+    int coremap_npage = (coremap_size + PAGE_SIZE - 1)/PAGE_SIZE;
+    paddr_t coremap_addr = ram_stealmem(coremap_npage);
+    
+    memlo += coremap_npage*PAGE_SIZE;
+    memlo = ROUNDUP(memlo, PAGE_SIZE);
+    num_frames = (memhi - memlo)/PAGE_SIZE;
+
+    spinlock_acquire(&coremap_lock);
+    coremap = (cmap_entry *)PADDR_TO_KVADDR(coremap_addr);
+    for (int i = 0; i < num_frames; ++i){
+        coremap[i] = 0;
+    }
+    spinlock_release(&coremap_lock);
+
+#endif /* OPT_A3 */
 }
 
 static
@@ -67,11 +89,47 @@ paddr_t
 getppages(unsigned long npages)
 {
 	paddr_t addr;
-
 	spinlock_acquire(&stealmem_lock);
-
-	addr = ram_stealmem(npages);
-	
+#if OPT_A3
+    if(coremap){
+        int first;
+        bool found = false;
+        spinlock_acquire(&coremap_lock);
+        for (int i = 0; i < num_frames && !found; ++i){
+            if(coremap[i] == 0){
+                int ctr = 1;
+                int j = i + 1;
+                for (; j < i + (int)npages; ++j){
+                    if (coremap[j] == 0) {
+                        ++ctr;
+                    } else {
+                        break;
+                    }
+                }
+                if (ctr == (int)npages){
+                    first = i;
+                    found = true;
+                }
+                i = j - 1;
+            }
+        }
+        if (found){
+            coremap[first] = memlo + first*PAGE_SIZE;
+            for (int i = 1; i < (int)npages; ++i){
+                coremap[first + i] = i;
+            }
+            addr = (paddr_t) coremap[first];
+            spinlock_release(&coremap_lock);
+        } else {
+            spinlock_release(&stealmem_lock);
+            spinlock_release(&coremap_lock);
+            kprintf("Failed to allocate memory.\n");
+            return 0;
+        }
+    } else {
+        addr = ram_stealmem(npages);  
+    }
+#endif
 	spinlock_release(&stealmem_lock);
 	return addr;
 }
@@ -91,9 +149,23 @@ alloc_kpages(int npages)
 void 
 free_kpages(vaddr_t addr)
 {
-	/* nothing - leak the memory. */
-
-	(void)addr;
+#if OPT_A3
+    spinlock_acquire(&coremap_lock);
+    if (!coremap){
+        int first = (addr - memlo)/PAGE_SIZE;
+        KASSERT(coremap[first] != 0);
+        
+        coremap[first] = 0;
+        for (int i = 1; i < num_frames; ++i){
+            if ((int)coremap[first + i] == i){
+                coremap[first + i] = 0;
+            } else {
+                break;
+            }
+        }
+    }
+    spinlock_release(&coremap_lock);
+#endif 
 }
 
 void
@@ -250,9 +322,9 @@ void
 as_destroy(struct addrspace *as)
 {
     #if OPT_A3
-	    free_kpages(PADDR_TO_KVADDR(as->as_pbase1));
-	    free_kpages(PADDR_TO_KVADDR(as->as_pbase2));
-    	free_kpages(PADDR_TO_KVADDR(as->as_stackpbase));
+	    free_kpages(as->as_pbase1);
+	    free_kpages(as->as_pbase2);
+    	free_kpages(as->as_stackpbase);
 	#endif
 
 	kfree(as);

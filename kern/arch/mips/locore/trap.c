@@ -89,7 +89,6 @@ kill_curthread(vaddr_t epc, unsigned code, vaddr_t vaddr)
 		sig = SIGABRT;
 		break;
 	    case EX_MOD:
-        sys__exit(code);
 	    case EX_TLBL:
 	    case EX_TLBS:
 		sig = SIGSEGV;
@@ -114,8 +113,16 @@ kill_curthread(vaddr_t epc, unsigned code, vaddr_t vaddr)
 
     #if OPT_A3
        (void)epc;
-       (void)vaddr;
-        sys__exit(code);
+	   (void)vaddr;
+	   struct addrspace *as;
+	   struct proc *p = curproc;
+	   as_deactivate();
+	   as = curproc_setas(NULL);
+	   as_destroy(as);
+	   proc_remthread(curthread);
+	   proc_destroy(p);
+	   thread_exit();
+	   panic("Should not have returned here!\n");  (void)vaddr;
     #endif /* OPT_A3 */
 
 }
